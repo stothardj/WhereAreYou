@@ -1,18 +1,37 @@
-Edit this file to prove that you have figure out how.
-Git hub makes it really easy so that you don't have
+	Edit this file to prove that you have figure out how.
+For this to work you need to be a collaborator so give me your
+user name so that I can add you.
+
+	Git hub makes it really easy so that you don't have
 to even have git installed. Just click on the file name
 and click edit. Put some text here, put a commit message,
 and then commit. We'll play with different branches later.
 
-Right now this git repository can just be used
+	Although that is nice, you will want to be able to actually
+edit files normally then commit them instead of typing directly
+into the website. Here are the instructions on how to set that
+up. They are for ubuntu but should apply to whatever system you
+are using.
+
+Install git:
+sudo apt-get install git-core
+
+Clone repository. This will put it into it's own folder called WhereAre You:
+git clone git@github.com:{username}/WhereAreYou.git
+
+Make a change to atleast one file:
+vim README
+git add README
+git commit -m "My commit message"
+
+Push it onto the master branch of this repository:
+git push origin master
+
+	Right now this git repository can just be used
 for the members of the group to test out githubs
 functionality. Everyone please add your name to
 this readme file so that I know everyone knows
 how to use git. Then we can proceed to actually
 use github for out code later.
-
-This line was added using vim and will be pushed using terminal.
-It is a test which will later be replace by instructions on how
-to do commits until everyone has this working.
 
 Moo.
