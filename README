@@ -38,3 +38,15 @@ how to use git. Then we can proceed to actually
 use github for out code later.
 
 Moo.
+
+This branch will probably never be merged. Here is code that will go
+off on wild tangents as I test things. It may be useful to look at
+occasionally though.
+
+finger11.tac is the twisted server. It uses Twisted 10, pgasync, and postgres.
+You will need to setup up your own database using something like psql to
+test it. You will probably have to edit the pool= line to reflect your
+postgres username and password.
+
+KnockKnockClient.java is the client. It uses java. If you can figure out the
+server you should not have to change this.
