@@ -1,52 +1,10 @@
-	Edit this file to prove that you have figured out how.
-For this to work you need to be a collaborator so give me your
-user name so that I can add you.
+Here are jake's personal tests. Since I have a tendency to go off on tangents, I will use this branch as a place where I don't have to hold back.
 
-	Git hub makes it really easy so that you don't have
-to even have git installed. Just click on the file name
-and click edit. Put some text here, put a commit message,
-and then commit. We'll play with different branches later.
+File descriptions:
 
-	Although that is nice, you will want to be able to actually
-edit files normally then commit them instead of typing directly
-into the website. Here are the instructions on how to set that
-up. They are for ubuntu but should apply to whatever system you
-are using.
+finger11.tac - the twisted server
 
-Install git:
-sudo apt-get install git-core
+ClientRunner.java - acts as a client to run tests against the twisted server
+JavaClient.java - abstracts away the java client code to make it easy to use. Used by ClientRunner.java
 
-Clone repository. This will put it into it's own folder called WhereAre You:
-git clone git@github.com:{username}/WhereAreYou.git
-If it fails at this step and says something about a key, please tell me. It
-may be the case that I add everyone's public key to this repository so that
-it can be authenticated.
-
-Make a change to atleast one file:
-vim README
-git add README
-git commit -m "My commit message"
-
-Push it onto the master branch of this repository:
-git push origin master
-
-	Right now this git repository can just be used
-for the members of the group to test out githubs
-functionality. Everyone please add your name to
-this readme file so that I know everyone knows
-how to use git. Then we can proceed to actually
-use github for out code later.
-
-Moo.
-
-This branch will probably never be merged. Here is code that will go
-off on wild tangents as I test things. It may be useful to look at
-occasionally though.
-
-finger11.tac is the twisted server. It uses Twisted 10, pgasync, and postgres.
-You will need to setup up your own database using something like psql to
-test it. You will probably have to edit the pool= line to reflect your
-postgres username and password.
-
-KnockKnockClient.java is the client. It uses java. If you can figure out the
-server you should not have to change this.
+README - see README for more details

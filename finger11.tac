@@ -18,6 +18,7 @@ class FingerProtocol(basic.LineReceiver):
     print "Connection made"
 
   def lineReceived(self, user):
+    user = user.strip()
     print "Received query for: "+user
 
     def onError(err):
