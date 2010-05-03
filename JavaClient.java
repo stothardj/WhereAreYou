@@ -12,7 +12,7 @@ public class JavaClient{
 		socket = new Socket(host, port);
 		out = new PrintWriter(socket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		if(!in.readLine().equals("Connection made"))
+		if(!in.readLine().equals("Connection made!"))
 			System.out.println("Connection not validated!");
 	}
 	
