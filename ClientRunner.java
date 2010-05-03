@@ -1,10 +1,18 @@
+import java.io.BufferedReader;
 import java.io.IOException;
+import java.io.InputStreamReader;
 import java.net.UnknownHostException;
 import java.util.Iterator;
 import java.util.LinkedList;
 
 
 public class ClientRunner implements Runnable {
+	/*
+	 * Set this to true if you want to be put in an
+	 * interactive client terminal after tests have
+	 * been run. 
+	 */
+	public static final boolean INTERACTIVE = true;
 	
 	public static void main(String args[]) {
 		Thread t = new Thread(new ClientRunner());
@@ -32,11 +40,33 @@ public class ClientRunner implements Runnable {
 		
 		ts.runTests();
 		
+		if(INTERACTIVE) {
+			System.out.println("Entered interactive mode.");
+			System.out.println("Enter 'exit' to leave.");
+			
+			BufferedReader stdIn = new BufferedReader(new InputStreamReader(System.in));
+			String fromUser;
+			
+			try {
+				while(!(fromUser = stdIn.readLine()).equals("exit")) {
+					jc.sendLine(fromUser);
+					System.out.println("Client: "+fromUser);
+					System.out.println("Server: "+jc.readLine());
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+			
+			System.out.println("Leaving interactive mode.");
+		}
+		
 		try {
 			jc.disconnect();
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+		
+		System.out.println("Client runner is down.");
 	}
 	
 	private class TestStructure {
@@ -51,9 +81,10 @@ public class ClientRunner implements Runnable {
 				jc.sendLine(input);
 				try {
 					String ret = jc.readLine(); 
-					if(!ret.equals(expected)) {
-						System.err.println(input+" should return "+expected);
-						System.err.println("Instead returns "+ret);
+					if(ret.equals(expected)) {
+						System.out.println("Pass: "+input+" returned "+expected);
+					} else {
+						System.out.println("Fail: "+input+" should return "+expected+". Instead returns "+ret);
 					}
 				} catch (IOException e) {
 					e.printStackTrace();

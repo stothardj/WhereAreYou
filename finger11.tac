@@ -39,7 +39,8 @@ class FingerProtocol(basic.LineReceiver):
       d.addCallback(writeResponse)
       d.addErrback(onError)
 
-    pool.runInteraction(runQueries,"SELECT mystr FROM people WHERE name='"+user+"'")
+    #NOTE: The E in name=E%s is for the funny way postgres handles backslash
+    pool.runInteraction(runQueries,"SELECT mystr FROM people WHERE name=E%s", user)
 
 class FingerFactory(protocol.ServerFactory):
   protocol = FingerProtocol
