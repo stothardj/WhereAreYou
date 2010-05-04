@@ -2,7 +2,9 @@ Here are jake's personal tests. Since I have a tendency to go off on tangents, I
 
 File descriptions:
 
-finger11.tac - the twisted server
+gogodeX.tac - the twisted server configuration file. You WILL need to change this for your setup
+
+backend.py - the server code
 
 ClientRunner.java - acts as a client to run tests against the twisted server
 JavaClient.java - abstracts away the java client code to make it easy to use. Used by ClientRunner.java
