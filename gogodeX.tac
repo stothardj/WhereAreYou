@@ -8,6 +8,7 @@ from twisted.application import internet, service
 from twisted.internet import protocol, reactor, defer
 
 import sys
+#Unfortunatly, the location of the backend module is hardcoded
 sys.path.append('/home/jake/Documents/WhereAreYou')
 import backend
 
