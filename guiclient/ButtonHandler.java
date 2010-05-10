@@ -20,12 +20,12 @@ public class ButtonHandler implements ActionListener {
 		fields.put("Create User", new String[] {"First Name", "Last Name",
 				"User Name", "Password", "Account Type"} );
 		fields.put("Remove User", new String[] {"User Name", "Password"});
-		fields.put("Add Zone", new String[] {"User Name", "Zone Name", "X", "Y", "Radius", "Password"});
+		fields.put("Add Zone", new String[] {"User Name", "Zone Name", "Lat", "Lon", "Radius", "Password"});
 		fields.put("Remove Zone", new String[] {"User Name", "Zone Name", "Password"});
 		fields.put("Add Friend", new String[] {"User name", "Friend Name", "Password"});
 		fields.put("Accept Friend", new String[] {"User name", "Friend Name", "Password"});
 		fields.put("Remove Friend", new String[] {"User name", "Friend Name", "Password"});
-		fields.put("Update Coordinate", new String[] {"User Name", "X", "Y", "Password"});
+		fields.put("Update Coordinate", new String[] {"User Name", "Lat", "Lon", "Password"});
 		
 		
 		fieldPanel.removeAll();

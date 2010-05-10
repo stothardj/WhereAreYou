@@ -32,17 +32,19 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     #separate so that pgasync can handle sql injection
     def getQuery(message):
       def parseCreateUser(o):
-        return ("INSERT INTO tablename VALUES (%s, %s, %s, %s %s)",
+        return ("INSERT INTO peoplenames VALUES (\'%s\', \'%s\', \'%s\', \'%s\' \'%s\')",
         o['First Name'], o['Last Name'], o['User Name'], o['Password'],
         o['Account Type'])
       def parseRemoveUser(o):
-        return "Remove user"
+        return ("DELETE FROM peoplenames WHERE FirstName=\'%s\' AND LastName=\'%s\' AND UserName=\'%s\' AND Password=\'%s\' AND AccountType=\'%s\'",
+        o['First Name'], o['Last Name'], o['User Name'], o['Password'], o['Account Type'])
       def parseAddZone(o):
-        return "Add Zone"
+        return ("INSERT INTO zonenames VALUES (\'%s\', \'$s\')",
+        o['User Name'], o['Zone Name'], o['Lat'], o['Lon'], o['Radius'])
       def parseRemoveZone(o):
-        return "Remove Zone"
+        return ("DELETE FROM zonenames WHERE ZoneName=\'%s\'")
       def parseAddFriend(o):
-        return "Add friend"
+        return "Add Friend"
       def parseAcceptFriend(o):
         return "Accept friend"
       def parseRemoveFriend(o):
