@@ -1,12 +1,13 @@
-Here are jake's personal tests. Since I have a tendency to go off on tangents, I will use this branch as a place where I don't have to hold back.
+I seek no approval of what I put on this branch, but
+suggestions would be nice.
 
-File descriptions:
+Folder descriptions:
 
-gogodeX.tac - the twisted server configuration file. You WILL need to change this for your setup
+androidapp: The Android App (mostly backend for now)
 
-backend.py - the server code
+server: The Twisted Server
 
-ClientRunner.java - acts as a client to run tests against the twisted server
-JavaClient.java - abstracts away the java client code to make it easy to use. Used by ClientRunner.java
+guiclient: Java Swing client. Automatically formats json properly.
 
-README - see README for more details
+autoclient: In case you want to run a few tests over and over.
+
