@@ -10,4 +10,3 @@ server: The Twisted Server
 guiclient: Java Swing client. Automatically formats json properly.
 
 autoclient: In case you want to run a few tests over and over.
-
