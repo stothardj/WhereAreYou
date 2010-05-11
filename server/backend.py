@@ -44,7 +44,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a user!"
 
       def parseAddZone(o):
-        self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, E%f, E%f, E%f)",
+        self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
         (o['User Name'], o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
         return "Added a zone!"
 
@@ -70,13 +70,13 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
-        self.pool.runOperation("UPDATE users SET lat=E%f, lon=E%f WHERE username=E%s AND password=E%s",
-        (o['Lat'], o['Lon']))
+        self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s AND password=E%s",
+        (o['Lat'], o['Lon'], o['User Name'], o['Password']))
         return "Updated position!"
 
       parser = {'Create User': parseCreateUser, 'Remove User': parseRemoveUser,
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
-      parseAddFriend, 'Accept Friend': parseRemoveFriend, 'Remove Friend':
+      parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord}
 
       jd = json.JSONDecoder()
@@ -85,9 +85,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       return parser[obj['Request Type']](obj)
 
     try:
-      response = getQuery(line)
-      print response
-      self.sendLine(response)
+      self.sendLine(getQuery(line))
     except (ValueError, KeyError):
       self.sendLine("Invalid query. Handle this appropriatly!")
 

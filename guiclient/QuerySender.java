@@ -28,7 +28,7 @@ public class QuerySender implements ActionListener {
 			JTextField tf = (JTextField)fieldPanel.getComponent(i + 1);
 			String tls = tl.getText();
 			String tfs = tf.getText();
-			if(tls.equals("Lat") || tls.equals("Lon")) //int
+			if(tls.equals("Lat") || tls.equals("Lon") || tls.equals("Radius")) //float
 				running += "\""+tls+"\" : "+ tfs + ", ";
 			else //string
 				running += "\""+tls+"\" : \""+ tfs + "\", ";
