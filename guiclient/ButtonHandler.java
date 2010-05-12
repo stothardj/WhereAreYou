@@ -27,6 +27,10 @@ public class ButtonHandler implements ActionListener {
 		fields.put("Remove Friend", new String[] {"User Name", "Friend Name", "Password"});
 		fields.put("Update Coordinate", new String[] {"User Name", "Lat", "Lon", "Password"});
 		
+		fields.put("Login", new String[] {"User Name", "Password"});
+		fields.put("Show Users", new String[] {});
+		fields.put("Show Friends", new String[] {});
+		fields.put("Show Zones", new String[] {});
 		
 		fieldPanel.removeAll();
 		currentRequestType = src.getText();

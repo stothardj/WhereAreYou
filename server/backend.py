@@ -4,6 +4,10 @@ import json
 import glue
 
 class gogodeXProtocol(glue.NeutralLineReceiver):
+
+  #Set this to false for final
+  DEBUG = True
+
   def __init__(self):
     self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")
 
@@ -17,10 +21,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       return 'Internal error in server'
 
     def writeResponse(message):
-      if message != []:
-        self.sendLine(message[0][0])
-      else:
-        self.sendLine('User not found.')
+      self.sendLine(str(message))
 
     def runQueries(cur,query,args):
       cur.execute(query,args)
@@ -79,13 +80,29 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord}
 
+      if self.DEBUG:
+        def parseShowUsers(o):
+          self.pool.runInteraction(runQueries,"SELECT * FROM users")
+
+        def parseShowFriends(o):
+          self.pool.runInteraction(runQueries,"SELECT * FROM friends")
+
+        def parseShowZones(o):
+          self.pool.runInteraction(runQueries,"SELECT * FROM zonenames")
+
+        test_parser = {'Show Users' : parseShowUsers, 'Show Friends' : parseShowFriends,
+        'Show Zones': parseShowZones}
+        parser.update(test_parser)
+
       jd = json.JSONDecoder()
       obj = jd.decode(message)
 
       return parser[obj['Request Type']](obj)
 
     try:
-      self.sendLine(getQuery(line))
+      response = getQuery(line)
+      if response != None:
+        self.sendLine(response)
     except (ValueError, KeyError):
       self.sendLine("Invalid query. Handle this appropriatly!")
 

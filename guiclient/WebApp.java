@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.GridLayout;
 import java.util.LinkedList;
 
@@ -17,7 +16,7 @@ public class WebApp extends BaseApplet {
 		getContentPane().setLayout(new GridLayout(3, 1));
 		
 		
-		buttonPanel.setLayout(new GridLayout(2,4));
+		buttonPanel.setLayout(new GridLayout(3,4));
 		
 		LinkedList<String> commands = new LinkedList<String>();
 		commands.add("Create User");
@@ -28,6 +27,11 @@ public class WebApp extends BaseApplet {
 		commands.add("Accept Friend");
 		commands.add("Remove Friend");
 		commands.add("Update Coordinate");
+		
+		commands.add("Login");
+		commands.add("Show Users");
+		commands.add("Show Friends");
+		commands.add("Show Zones");
 		
 		for(String li : commands) {
 			JButton b = new JButton(li);
