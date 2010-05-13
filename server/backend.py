@@ -5,8 +5,9 @@ import glue
 
 class gogodeXProtocol(glue.NeutralLineReceiver):
 
-  #Set this to false for final
-  DEBUG = True
+  #Set thes to false for final
+  ALLOW_DEBUG_JSON = True
+  ALWAYS_RESPOND = True
 
   def __init__(self):
     self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")
@@ -29,6 +30,18 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       d.addCallback(writeResponse)
       d.addErrback(onError)
 
+    def validateUser(cur, o, callback):
+      cur.execute("SELECT * FROM users WHERE UserName=E%s AND Password=E%s", (o['User Name'], o['Password']))
+      d = cur.fetchall()
+
+      def executeFunctionOnSuccess(message):
+        if message != []: #Invalid user would return empty list
+          return callback()
+
+      d.addCallback(executeFunctionOnSuccess)
+      d.addErrback(onError)
+
+
     #json message -> sql query. Tuple with parameters to be applied
     #separate so that pgasync can handle sql injection
     def getQuery(message):
@@ -45,29 +58,45 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a user!"
 
       def parseAddZone(o):
-        self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
-        (o['User Name'], o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
+        tempfun = (lambda:
+          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
+          (o['User Name'], o['Zone Name'], o['Lat'], o['Lon'], o['Radius'])))
+
+        self.pool.runInteraction(validateUser, o, tempfun)
         return "Added a zone!"
 
       def parseRemoveZone(o):
-        self.pool.runOperation("DELETE FROM zonenames WHERE ZoneName=E%s", o['Zone Name'])
+        tempfun = (lambda:
+          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s AND ZoneName=E%s", (o['User Name'], o['Zone Name'])))
+
+        self.pool.runInteraction(validateUser, o, tempfun)
         return "Removed a zone!"
 
       def parseAddFriend(o):
         #This will be replaced by ryan
-        #Horribly inefficient
-        self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['User Name'], o['Friend Name']))
-        self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], o['User Name']))
+
+        tempfun = (lambda:
+          [f() for f in [
+          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (o['User Name'], o['Friend Name'])),
+          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], o['User Name']))]])
+
+        self.pool.runInteraction(validateUser, o, tempfun)
         return "Added a friend!"
 
       def parseAcceptFriend(o):
-        self.pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s) OR (username=E%s AND friendname=E%s)",
-        (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name']))
+        tempfun = (lambda:
+          self.pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s AND status='Unaccepted') OR (username=E%s AND friendname=E%s AND status='Pending')",
+          (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name'])))
+
+        self.pool.runInteraction(validateUser, o, tempfun)
         return "Accepted a friend!"
 
       def parseRemoveFriend(o):
-        self.pool.runOperation("DELETE FROM friends WHERE (username=E%s AND friendname=E%s) OR (username=E%s AND friendname=E%s)",
-        (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name']))
+        tempfun = (lambda:
+          self.pool.runOperation("DELETE FROM friends WHERE (username=E%s AND friendname=E%s) OR (username=E%s AND friendname=E%s)",
+          (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name'])))
+
+        self.pool.runInteraction(validateUser, o, tempfun)
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
@@ -80,7 +109,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord}
 
-      if self.DEBUG:
+      if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM users")
 
@@ -101,7 +130,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
     try:
       response = getQuery(line)
-      if response != None:
+      if self.ALWAYS_RESPOND and response != None:
         self.sendLine(response)
     except (ValueError, KeyError):
       self.sendLine("Invalid query. Handle this appropriatly!")
