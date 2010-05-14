@@ -10,7 +10,6 @@ public class ActionConnect implements ActionListener {
 	public ActionConnect(WebApp wa) {
 		this.wa = wa;
 	}
-	@Override
 	public void actionPerformed(ActionEvent arg0) {
 		
 		try {

@@ -16,7 +16,7 @@ public class WebApp extends BaseApplet {
 		getContentPane().setLayout(new GridLayout(3, 1));
 		
 		
-		buttonPanel.setLayout(new GridLayout(3,4));
+		buttonPanel.setLayout(new GridLayout(4,4));
 		
 		LinkedList<String> commands = new LinkedList<String>();
 		commands.add("Create User");
@@ -27,6 +27,10 @@ public class WebApp extends BaseApplet {
 		commands.add("Accept Friend");
 		commands.add("Remove Friend");
 		commands.add("Update Coordinate");
+		commands.add("Empty All");
+		commands.add("Empty Friends");
+		commands.add("Empty Users");
+		commands.add("Empty Zones");
 		
 		commands.add("Login");
 		commands.add("Show Users");

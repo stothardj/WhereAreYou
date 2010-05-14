@@ -11,8 +11,6 @@ public class ButtonHandler implements ActionListener {
 		this.fieldPanel = fieldPanel;
 		this.currentRequestType = "Create User";
 	}
-	
-	@Override
 	public void actionPerformed(ActionEvent ae) {
 		JButton src = ((JButton)ae.getSource());
 		HashMap<String,String[]> fields = new HashMap<String,String[]>();
@@ -26,6 +24,16 @@ public class ButtonHandler implements ActionListener {
 		fields.put("Accept Friend", new String[] {"User Name", "Friend Name", "Password"});
 		fields.put("Remove Friend", new String[] {"User Name", "Friend Name", "Password"});
 		fields.put("Update Coordinate", new String[] {"User Name", "Lat", "Lon", "Password"});
+		
+		/*		commands.add("Empty All");
+		commands.add("Empty Friends");
+		commands.add("Empty Users");
+		commands.add("Empty Zones");*/
+		fields.put("Empty All", new String[] {});
+		fields.put("Empty Friends", new String[] {});
+		fields.put("Empty Users", new String[] {});
+		fields.put("Empty Zones", new String[] {});
+		
 		
 		fields.put("Login", new String[] {"User Name", "Password"});
 		fields.put("Show Users", new String[] {});

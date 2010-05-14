@@ -16,8 +16,6 @@ public class QuerySender implements ActionListener {
 		this.bh = bh;
 		this.jc = jc;
 	}
-	
-	@Override
 	public void actionPerformed(ActionEvent ae) {
 		
 		//Generate JSON
