@@ -55,6 +55,15 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseRemoveUser(o):
         self.pool.runOperation("DELETE FROM users WHERE UserName=E%s AND Password=E%s",
         (o['User Name'], o['Password']))
+
+        tempfun = (lambda:
+          [f() for f in[
+          self.pool.runOperation("DELETE FROM friends WHERE UserName=E%s OR FriendName=E%s", (o['User Name'], o['User Name'])),
+          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s", o['User Name'])
+          ]])
+
+        self.pool.runInteraction(validateUser, o, tempfun)
+
         return "Removed a user!"
 
       def parseAddZone(o):
