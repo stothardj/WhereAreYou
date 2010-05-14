@@ -7,7 +7,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
   #Set thes to false for final
   ALLOW_DEBUG_JSON = True
-  ALWAYS_RESPOND = True
+  ALWAYS_RESPOND = False
 
   def __init__(self):
     self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")

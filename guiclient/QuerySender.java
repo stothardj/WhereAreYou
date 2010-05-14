@@ -10,12 +10,11 @@ import javax.swing.JTextField;
 
 public class QuerySender implements ActionListener {
 
-	public QuerySender(String host, int port, JPanel fieldPanel, JPanel queryPanel, ButtonHandler bh) throws UnknownHostException, IOException {
+	public QuerySender(JavaClient jc, JPanel fieldPanel, JPanel queryPanel, ButtonHandler bh) throws UnknownHostException, IOException {
 		this.fieldPanel = fieldPanel;
 		this.queryPanel = queryPanel;
 		this.bh = bh;
-		jc = new JavaClient(host, port);
-		jc.connect();
+		this.jc = jc;
 	}
 	
 	@Override
@@ -40,14 +39,6 @@ public class QuerySender implements ActionListener {
 		
 		//Send query to server
 		jc.sendLine(running);
-		
-		try {
-			String s = jc.readLine();
-			//System.out.println("Server response: "+s);
-			((JTextArea)queryPanel.getComponent(1)).setText("Server: "+s);
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 	}
 
 	private ButtonHandler bh;

@@ -18,7 +18,9 @@ public class ActionConnect implements ActionListener {
 			int port = Integer.parseInt(((JTextField)wa.queryPanel.getComponent(1)).getText());
 			wa.queryPanel.setLayout(new GridLayout(3,1));
 			JButton sendQuery = new JButton("Send Query");
-			sendQuery.addActionListener(new QuerySender(host, port, wa.fieldPanel, wa.queryPanel, wa.bh));
+			JavaClient jc = new JavaClient(host, port);
+			jc.connect();
+			sendQuery.addActionListener(new QuerySender(jc , wa.fieldPanel, wa.queryPanel, wa.bh));
 			wa.queryPanel.removeAll();
 			JTextArea cta = new JTextArea("Client: ");
 			cta.setLineWrap(true);
@@ -29,6 +31,8 @@ public class ActionConnect implements ActionListener {
 			sta.setEditable(false);
 			wa.queryPanel.add(sta);
 			wa.queryPanel.add(sendQuery);
+			QueryReceiver qr = new QueryReceiver(jc, sta);
+			qr.start();
 			
 			wa.queryPanel.revalidate();
 			wa.queryPanel.repaint();
@@ -43,6 +47,5 @@ public class ActionConnect implements ActionListener {
 		}
 		
 	}
-
 	private WebApp wa;
 }
