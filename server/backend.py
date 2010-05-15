@@ -50,11 +50,16 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       d = cur.fetchall()
 
       def executeFunctionOnSuccess(message):
+        msg = {}
+        msg['Response Type']='User Validation'
+
         if message != []: #Invalid user would return empty list
-          print "User was validated"
+          msg['Authentication']='Accepted'
+          self.sendLine(json.dumps(msg))
           return callback()
         else:
-          print "Invalid user"
+          msg['Authentication']='Failure'
+          self.sendLine(json.dumps(msg))
 
       d.addCallback(executeFunctionOnSuccess)
       d.addErrback(onError)
@@ -64,74 +69,63 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     def getQuery(message):
 
       def parseCreateUser(o):
+        #Ryan, what is the best way to keep username unique?
         self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, 0, 0)",
         (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
         o['Account Type']))
         return "Created a user!"
 
       def parseRemoveUser(o):
-        self.pool.runOperation("DELETE FROM users WHERE UserName=E%s AND Password=E%s",
-        (o['User Name'], o['Password']))
-
-        tempfun = (lambda:
-          [f() for f in[
-          self.pool.runOperation("DELETE FROM friends WHERE UserName=E%s OR FriendName=E%s", (o['User Name'], o['User Name'])),
-          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s", o['User Name'])
-          ]])
-
-        self.pool.runInteraction(validateUser, o, tempfun)
+        if self.username != None:
+          self.pool.runOperation("DELETE FROM users WHERE UserName=E%s", self.username)
+          self.pool.runOperation("DELETE FROM friends WHERE UserName=E%s OR FriendName=E%s", (self.username, self.username))
+          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s", self.username)
 
         return "Removed a user!"
 
       def parseAddZone(o):
-        tempfun = (lambda:
+        if self.username != None:
           self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
-          (o['User Name'], o['Zone Name'], o['Lat'], o['Lon'], o['Radius'])))
+          (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
 
-        self.pool.runInteraction(validateUser, o, tempfun)
         return "Added a zone!"
 
       def parseRemoveZone(o):
-        tempfun = (lambda:
-          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s AND ZoneName=E%s", (o['User Name'], o['Zone Name'])))
+        if self.username != None:
+          self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s AND ZoneName=E%s", (self.username, o['Zone Name']))
 
-        self.pool.runInteraction(validateUser, o, tempfun)
         return "Removed a zone!"
 
       def parseAddFriend(o):
-        #This will be replaced by ryan
+        #TODO: confirm existence of friend account.
+        if self.username != None:
+          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
+          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
 
-        tempfun = (lambda:
-          [f() for f in [
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (o['User Name'], o['Friend Name'])),
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], o['User Name']))]])
-
-        self.pool.runInteraction(validateUser, o, tempfun)
         return "Added a friend!"
 
       def parseAcceptFriend(o):
-        tempfun = (lambda:
+        if self.username != None:
           self.pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s AND status='Unaccepted') OR (username=E%s AND friendname=E%s AND status='Pending')",
-          (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name'])))
+          (self.username, o['Friend Name'], o['Friend Name'], self.username))
 
-        self.pool.runInteraction(validateUser, o, tempfun)
         return "Accepted a friend!"
 
       def parseRemoveFriend(o):
-        tempfun = (lambda:
+        if self.username != None:
           self.pool.runOperation("DELETE FROM friends WHERE (username=E%s AND friendname=E%s) OR (username=E%s AND friendname=E%s)",
-          (o['User Name'], o['Friend Name'], o['Friend Name'], o['User Name'])))
+          (self.username, o['Friend Name'], o['Friend Name'], self.username))
 
-        self.pool.runInteraction(validateUser, o, tempfun)
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
-        self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s AND password=E%s",
-        (o['Lat'], o['Lon'], o['User Name'], o['Password']))
+        self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
+        (o['Lat'], o['Lon'], self.username))
 
         def pushPosition(friends):
           msg = {}
-          msg['User Name']=o['User Name']
+          msg['Response Type']='Position Update'
+          msg['User Name']=self.username
           msg['Lat']=o['Lat']
           msg['Lon']=o['Lon']
           sentLine = json.dumps(msg)
@@ -149,13 +143,14 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           d.addCallback(pushPosition)
           d.addErrback(onError)
 
-        self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", o['User Name'])
+        self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
 
         return "Updated position!"
 
       def parseLogin(o):
-
         def login():
+          if self.username != None:
+            self.logout()
           self.username = o['User Name']
           self.factory.loginUser(o['User Name'], self)
           print "User name is now ", self.username

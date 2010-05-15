@@ -31,7 +31,6 @@ public class WebApp extends BaseApplet {
 		commands.add("Empty Friends");
 		commands.add("Empty Users");
 		commands.add("Empty Zones");
-		
 		commands.add("Login");
 		commands.add("Show Users");
 		commands.add("Show Friends");

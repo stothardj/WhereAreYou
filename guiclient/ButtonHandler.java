@@ -1,3 +1,4 @@
+import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -17,24 +18,17 @@ public class ButtonHandler implements ActionListener {
 		
 		fields.put("Create User", new String[] {"First Name", "Last Name",
 				"User Name", "Password", "Account Type"} );
-		fields.put("Remove User", new String[] {"User Name", "Password"});
-		fields.put("Add Zone", new String[] {"User Name", "Zone Name", "Lat", "Lon", "Radius", "Password"});
-		fields.put("Remove Zone", new String[] {"User Name", "Zone Name", "Password"});
-		fields.put("Add Friend", new String[] {"User Name", "Friend Name", "Password"});
-		fields.put("Accept Friend", new String[] {"User Name", "Friend Name", "Password"});
-		fields.put("Remove Friend", new String[] {"User Name", "Friend Name", "Password"});
-		fields.put("Update Coordinate", new String[] {"User Name", "Lat", "Lon", "Password"});
-		
-		/*		commands.add("Empty All");
-		commands.add("Empty Friends");
-		commands.add("Empty Users");
-		commands.add("Empty Zones");*/
+		fields.put("Remove User", new String[] {});
+		fields.put("Add Zone", new String[] {"Zone Name", "Lat", "Lon", "Radius"});
+		fields.put("Remove Zone", new String[] {"Zone Name"});
+		fields.put("Add Friend", new String[] {"Friend Name"});
+		fields.put("Accept Friend", new String[] {"Friend Name"});
+		fields.put("Remove Friend", new String[] {"Friend Name"});
+		fields.put("Update Coordinate", new String[] {"Lat", "Lon"});
 		fields.put("Empty All", new String[] {});
 		fields.put("Empty Friends", new String[] {});
 		fields.put("Empty Users", new String[] {});
 		fields.put("Empty Zones", new String[] {});
-		
-		
 		fields.put("Login", new String[] {"User Name", "Password"});
 		fields.put("Show Users", new String[] {});
 		fields.put("Show Friends", new String[] {});
@@ -43,17 +37,20 @@ public class ButtonHandler implements ActionListener {
 		fieldPanel.removeAll();
 		currentRequestType = src.getText();
 		String[] arr = fields.get(currentRequestType);
-		fieldPanel.setLayout(new GridLayout(arr.length, 2));
-		for(String field : arr) {
-			JLabel flabel = new JLabel(field);
-			fieldPanel.add(flabel);
-			fieldPanel.add(new JTextField());
+		if(arr.length > 0) {
+			fieldPanel.setLayout(new GridLayout(arr.length, 2));
+			for(String field : arr) {
+				JLabel flabel = new JLabel(field);
+				fieldPanel.add(flabel);
+				fieldPanel.add(new JTextField());
+			}
+		} else {
+			fieldPanel.setLayout(new BorderLayout());
+			fieldPanel.add(new JLabel(currentRequestType+" requires no fields. Hit send query and it will go."));
 		}
 		
 		fieldPanel.revalidate();
-		fieldPanel.repaint();
-		
-		
+		fieldPanel.repaint();	
 	}
 	
 	public String getRequestType() {
