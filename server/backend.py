@@ -1,3 +1,4 @@
+from twisted.internet import protocol
 from pgasync import ConnectionPool
 import json
 
@@ -5,15 +6,29 @@ import glue
 
 class gogodeXProtocol(glue.NeutralLineReceiver):
 
-  #Set thes to false for final
+  username = None
+
+  #Set these to false for final
   ALLOW_DEBUG_JSON = True
   ALWAYS_RESPOND = False
 
   def __init__(self):
     self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")
 
+  def logout(self):
+    if self.username != None:
+      self.factory.logoutUser(self.username)
+      self.username = None
+
   def connectionMade(self):
-    self.sendLine("Connection made!")
+    if self.ALWAYS_RESPOND:
+      self.sendLine("Connection made!")
+    else:
+      print "Connection made!"
+
+  def connectionLost(self, reason):
+    self.logout()
+    print "Connection lost!"
 
   def neutralLineReceived(self, line):
     print "Received query for: "+line
@@ -36,11 +51,13 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def executeFunctionOnSuccess(message):
         if message != []: #Invalid user would return empty list
+          print "User was validated"
           return callback()
+        else:
+          print "Invalid user"
 
       d.addCallback(executeFunctionOnSuccess)
       d.addErrback(onError)
-
 
     #json message -> sql query. Tuple with parameters to be applied
     #separate so that pgasync can handle sql injection
@@ -111,12 +128,45 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseUpdateCoord(o):
         self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s AND password=E%s",
         (o['Lat'], o['Lon'], o['User Name'], o['Password']))
+
+        def pushPosition(friends):
+          msg = {}
+          msg['User Name']=o['User Name']
+          msg['Lat']=o['Lat']
+          msg['Lon']=o['Lon']
+          sentLine = json.dumps(msg)
+          for a in friends:
+            friend = a[0]
+            try:
+              self.factory.loggedin_users[friend].sendLine(sentLine)
+            except:
+              pass
+              #print "Friend", friend, "is not logged in."
+
+        def getFriends(cur,query,args):
+          cur.execute(query,args)
+          d = cur.fetchall()
+          d.addCallback(pushPosition)
+          d.addErrback(onError)
+
+        self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", o['User Name'])
+
         return "Updated position!"
+
+      def parseLogin(o):
+
+        def login():
+          self.username = o['User Name']
+          self.factory.loginUser(o['User Name'], self)
+          print "User name is now ", self.username
+
+        self.pool.runInteraction(validateUser, o, login)
+        return "Logged in!"
 
       parser = {'Create User': parseCreateUser, 'Remove User': parseRemoveUser,
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
-      parseRemoveFriend, 'Update Coordinate': parseUpdateCoord}
+      parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):
@@ -139,11 +189,24 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
     try:
       response = getQuery(line)
-      if self.ALWAYS_RESPOND and response != None:
-        self.sendLine(response)
+      if response != None:
+        if self.ALWAYS_RESPOND:
+          self.sendLine(response)
+        else:
+          print response
     except (ValueError, KeyError):
-      self.sendLine("Invalid query. Handle this appropriatly!")
+      if self.ALWAYS_RESPOND:
+        self.sendLine("Invalid query. Handle this appropriatly!")
+      else:
+        print "Invalid query. Handle this appropriatly!"
 
+class gogodeXFactory(protocol.ServerFactory):
+  protocol = gogodeXProtocol
 
-    #NOTE: The E in name=E%s is for the funny way postgres handles backslash
-    #self.pool.runInteraction(runQueries,"SELECT mystr FROM people WHERE name=E%s", line)
+  loggedin_users = {}
+
+  def loginUser(self, username, protocolInstance):
+    self.loggedin_users[username] = protocolInstance
+
+  def logoutUser(self, username):
+    del self.loggedin_users[username]

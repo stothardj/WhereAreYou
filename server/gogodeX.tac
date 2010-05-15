@@ -5,17 +5,14 @@
 #Liscencse will go here
 
 from twisted.application import internet, service
-from twisted.internet import protocol, reactor, defer
+from twisted.internet import reactor, defer
 
 import sys
 #Unfortunatly, the location of the backend module is hardcoded
 sys.path.append('/home/jake/Documents/WhereAreYou/server')
 import backend
 
-class gogodeXFactory(protocol.ServerFactory):
-  protocol = backend.gogodeXProtocol
-
 application = service.Application('gogodeX', uid=1, gid=1)
-factory = gogodeXFactory()
+factory = backend.gogodeXFactory()
 internet.TCPServer(79, factory).setServiceParent(
   service.IServiceCollection(application))
