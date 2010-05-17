@@ -1,0 +1,56 @@
+This is information which coulde be helpful for setting up or
+interfacing with this server.
+
+INSTALL
+Install Twisted 10.0.0, Python 2.6.5 (This will not work with Python 3),
+pgasync, and postgreSQL. Setup tables appropriatly (I will document this
+later).
+
+JSON API
+Note: Case sensitive
+
+Request Type: Create User
+Fields: First Name, Last Name, User Name, Password, Account Type
+
+Request Type: Remove User
+Fields: None
+
+Request Type: Add Zone
+Fields: Zone Name, Lat, Lon, Radius
+
+Request Type: Remove Zone
+Fields: Zone Name
+
+Request Type: Add Friend
+Fields: Friend Name
+
+Request Type: Accept Friend
+Fields: Friend Name
+
+Request Type: Remove Friend
+Fields: Friend Name
+
+Request Type: Update Coordinate
+Fields: Lat, Lon
+
+Request Type: Login
+Fields: User Name, Password
+
+JSON API (Testing only)
+
+Request Type: Show Users
+Fields: None
+
+Request Type: Show Friends
+Fields: None
+
+Request Type: Show Zones
+Fields: None
+
+SERVER RESPONSE JSON
+Response Type: User Validation
+Fields: Authentication
+
+Response Type: Position Update
+Fields: User Name, Lat, Lon
+
