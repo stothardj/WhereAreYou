@@ -4,4 +4,9 @@
     <string name="app_name">GUI</string>
     <string name="mapActivity_name">Map Activity</string>
     <string name="settingActivity_name">Map Activity</string>
+    <string name="tabs_name">Tabs</string>
+   
+    <string name="title_show_hide">Show/Hide</string>
+    <string name="title_show_hide_toggle">Show/Hide</string>
+    <string name="summary_show_hide_toggle">Click to toggle between show and hide.</string>
 </resources>

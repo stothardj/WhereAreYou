@@ -1,16 +1,13 @@
 package gogodeX.GUI;
 
-import android.app.Activity;
 import android.os.Bundle;
-import android.widget.TextView;
+import android.preference.*;
 
-public class SettingsTabActivity extends Activity {
+public class SettingsTabActivity extends PreferenceActivity {
     @Override
     public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
 
-        TextView textview = new TextView(this);
-        textview.setText("This is the settings tab");
-        setContentView(textview);
+        super.onCreate(savedInstanceState);
+        addPreferencesFromResource(R.xml.settings);
     }
 }
