@@ -54,14 +54,37 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         msg['Response Type']='User Validation'
 
         if message != []: #Invalid user would return empty list
-          msg['Authentication']='Accepted'
+          msg['Success']=True
           self.sendLine(json.dumps(msg))
           return callback()
         else:
-          msg['Authentication']='Failure'
+          msg['Success']=False
           self.sendLine(json.dumps(msg))
 
       d.addCallback(executeFunctionOnSuccess)
+      d.addErrback(onError)
+
+    def uniqueUser(cur, uname, calltuple):
+      (unique, notunique) = calltuple
+      cur.execute("SELECT * FROM users WHERE UserName=E%s", uname)
+      d = cur.fetchall()
+
+      def executeAppropriateFunction(message):
+        msg = {}
+        msg['Response Type']='Pre-existing User'
+        msg['User Name']=uname
+
+        if message == []:
+          msg['Exists']=False
+          self.sendLine(json.dumps(msg))
+          if unique != None:
+            return unique()
+        else:
+          msg['Exists']=True
+          self.sendLine(json.dumps(msg))
+          if notunique != None:
+            return notunique()
+      d.addCallback(executeAppropriateFunction)
       d.addErrback(onError)
 
     #json message -> sql query. Tuple with parameters to be applied
@@ -69,10 +92,11 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     def getQuery(message):
 
       def parseCreateUser(o):
-        #Ryan, what is the best way to keep username unique?
-        self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, 0, 0)",
-        (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
-        o['Account Type']))
+        tempfun = (lambda:
+          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, 0, 0)",
+          (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
+          o['Account Type'])))
+        self.pool.runInteraction(uniqueUser, o['User Name'], (tempfun, None))
         return "Created a user!"
 
       def parseRemoveUser(o):
@@ -97,10 +121,12 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a zone!"
 
       def parseAddFriend(o):
-        #TODO: confirm existence of friend account.
         if self.username != None:
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
+          tempfun = (lambda:
+                       [f() for f in [
+                self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name'])),
+                self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))]])
+          self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, tempfun))
 
         return "Added a friend!"
 
