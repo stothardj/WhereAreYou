@@ -119,33 +119,34 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
-        self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
-        (o['Lat'], o['Lon'], self.username))
+        if self.username != None:
+          self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
+          (o['Lat'], o['Lon'], self.username))
 
-        def pushPosition(friends):
-          msg = {}
-          msg['Response Type']='Position Update'
-          msg['User Name']=self.username
-          msg['Lat']=o['Lat']
-          msg['Lon']=o['Lon']
-          sentLine = json.dumps(msg)
-          for a in friends:
-            friend = a[0]
-            try:
-              self.factory.loggedin_users[friend].sendLine(sentLine)
-            except:
-              pass
-              #print "Friend", friend, "is not logged in."
+          def pushPosition(friends):
+            msg = {}
+            msg['Response Type']='Position Update'
+            msg['User Name']=self.username
+            msg['Lat']=o['Lat']
+            msg['Lon']=o['Lon']
+            sentLine = json.dumps(msg)
+            for a in friends:
+              friend = a[0]
+              try:
+                self.factory.loggedin_users[friend].sendLine(sentLine)
+              except:
+                pass
+                #print "Friend", friend, "is not logged in."
 
-        def getFriends(cur,query,args):
-          cur.execute(query,args)
-          d = cur.fetchall()
-          d.addCallback(pushPosition)
-          d.addErrback(onError)
+          def getFriends(cur,query,args):
+            cur.execute(query,args)
+            d = cur.fetchall()
+            d.addCallback(pushPosition)
+            d.addErrback(onError)
 
-        self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
+          self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
 
-        return "Updated position!"
+          return "Updated position!"
 
       def parseLogin(o):
         def login():
