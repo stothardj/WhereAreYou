@@ -10,12 +10,12 @@ class NeutralLineReceiver(basic.LineReceiver):
   #the difference between \r\n and \n.
   delimiter = '\n'
   def lineReceived(self, line):
-    #Do NOT overwrite this.
+    #Do NOT overrride this.
     if line[-1] == '\r':
       line = line[0:-1]
     return self.neutralLineReceived(line)
   def neutralLineReceived(self, line):
-    #Overwrite this function instead of lineReceived
+    #Override this function instead of lineReceived
     raise NotImplementedError
   def sendLine(self, line):
     print line
