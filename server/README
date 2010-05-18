@@ -49,8 +49,10 @@ Fields: None
 
 SERVER RESPONSE JSON
 Response Type: User Validation
-Fields: Authentication
+Fields: Success
 
 Response Type: Position Update
 Fields: User Name, Lat, Lon
 
+Response Type: Friend Request
+Fields: From User

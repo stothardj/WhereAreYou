@@ -121,12 +121,19 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a zone!"
 
       def parseAddFriend(o):
-        if self.username != None:
-          tempfun = (lambda:
-                       [f() for f in [
-                self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name'])),
-                self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))]])
-          self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, tempfun))
+        if self.username != None and self.username != o['Friend Name']:
+          def addFriend():
+            self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
+            self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
+            msg = {}
+            msg['Response Type']='Friend Request'
+            msg['From User']=self.username
+            try:
+              self.factory.loggedin_users[o['Friend Name']].sendLine(json.dumps(msg))
+            except:
+              pass
+            
+          self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, addFriend))
 
         return "Added a friend!"
 
