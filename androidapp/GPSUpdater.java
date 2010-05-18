@@ -24,6 +24,8 @@ public class GPSUpdater extends Service {
 	private static gogodeX deX;
 	//JavaClient to connect to the twisted server
 	private JavaClient client;
+	//private RspHandler handler;
+	private Thread t;
 	//JSONStringer to parse a string into a json string
 	private JSONStringer coordinates;
 	//Holds the user's current Location
@@ -31,7 +33,6 @@ public class GPSUpdater extends Service {
 	//Variables for holding latitude and longitude values
 	private static double latitude;
 	private static double longitude;
-	
 	//Handler for handling incoming server messages
 	private messageHandler serverUpdates;
 	
@@ -58,25 +59,23 @@ public class GPSUpdater extends Service {
 	    //Get the last known location of the device for the user's starting location
 	    location = LM.getLastKnownLocation(mocLocationProvider);
 	    //Create a new client to the twisted server
-	    client = new JavaClient("169.232.101.67", 79);
-	    try 
-	    {
-	    	//Try to connect to the twisted server
+		try 
+		{
+			client = new JavaClient("169.232.239.171", 79);
 			client.connect();
 		} 
-	    catch (UnknownHostException e) 
-	    {
-			TV.append("Could not find the server!");
-			e.printStackTrace();
-		} 
-	    catch (IOException e) 
-	    {
-			TV.append("Could not find the server!");
-			e.printStackTrace();
-		} 
-		//Begin listening for messages
+		catch (UnknownHostException e1)
+		{
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		catch (IOException e1)
+		{
+			e1.printStackTrace();
+		}
 		serverUpdates = new messageHandler(client, this);
-		serverUpdates.run();
+	    t = new Thread(serverUpdates);
+	    t.start();
 	}
 	
 	//Class to handle GPS updates
@@ -87,6 +86,8 @@ public class GPSUpdater extends Service {
 	            	location = L;
 	            	//Create a new JSONStringer to create a JSON string to send to the server
 	            	coordinates = new JSONStringer();
+	            	JSONStringer login = new JSONStringer();
+	            	JSONStringer newUser = new JSONStringer();
 	            		//As long as the new location was received
 	                    if (L != null) 
 	                    { 
@@ -95,13 +96,26 @@ public class GPSUpdater extends Service {
 	                    	longitude = L.getLongitude();          
 	                    	try 
 	                    	{
+	                    		newUser.object();
+	                    		newUser.key("User Name").value("bagrm");
+	                    		newUser.key("Password").value("password");
+	                    		newUser.key("First Name").value("Brian");
+	                    		newUser.key("Last Name").value("Garfinkel");
+	                    		newUser.key("Account Type").value("User");
+	                    		newUser.key("Request Type").value("Create User");
+	                    		newUser.endObject();
+	                    		
+	                    		login.object();
+	                    		login.key("User Name").value("bagrm");
+	                    		login.key("Password").value("password");
+	                    		login.key("Request Type").value("Login");
+	                    		login.endObject();
+	                    		
 	                    		//Create a new JSON object
 	                    		coordinates.object();
 	                    		//Add the keys needed for updating a user's coordinates
 								coordinates.key("Lon").value(longitude);
 		                    	coordinates.key("Lat").value(latitude);
-		                    	coordinates.key("User Name").value("fishmicmuffin");
-		                    	coordinates.key("Password").value("eat me");
 		                    	coordinates.key("Request Type").value("Update Coordinate");
 		                    	//End the JSON object
 		                    	coordinates.endObject();
@@ -113,18 +127,9 @@ public class GPSUpdater extends Service {
 							}
 	                    	TV.append(coordinates.toString());
 	                    	//Send the parsed JSON update coordinates request
-	                    	client.sendLine(coordinates.toString());
-	                    	try 
-	                    	{
-								TV.append(client.readLine());
-								TV.append(client.readLine());
-							} 
-	                    	catch (IOException e) 
-	                    	{
-								// TODO Auto-generated catch block
-								e.printStackTrace();
-							}
-	              	                 
+	                    		client.sendLine(newUser.toString());
+	                    		client.sendLine(login.toString());
+								client.sendLine(coordinates.toString());
 	                    } 
 	                    else 
 	                    {

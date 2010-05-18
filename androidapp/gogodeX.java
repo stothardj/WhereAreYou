@@ -13,6 +13,7 @@ public class gogodeX extends Activity {
     private static TextView TV;
     private static LocationManager LM;
     private static GPSUpdater GPS;
+    
 @Override 
 public void onCreate(Bundle savedInstanceState) { 
 	
@@ -42,4 +43,3 @@ public static void setGPS(GPSUpdater GPS1)
 }
 
 }
-
