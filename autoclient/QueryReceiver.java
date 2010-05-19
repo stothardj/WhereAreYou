@@ -10,7 +10,7 @@ public class QueryReceiver extends Thread {
 	@Override
 	public void run() {
 		
-		while(true) { //I know there is a better way, look into later
+		while(jc.isConnected()) { //I know there is a better way, look into later
 			try {
 				String s = jc.readLine();
 				System.out.println("Server to "+user+": "+s);

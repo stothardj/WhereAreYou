@@ -3,8 +3,7 @@ import java.net.*;
 
 public class JavaClient{
 	public JavaClient(String name, String host, int port) {
-		QueryReceiver q = new QueryReceiver(this, name);
-		q.start();
+		q = new QueryReceiver(this, name);
 		this.host = host;
 		this.port = port;
 		this.delimeter = "\n";
@@ -14,9 +13,12 @@ public class JavaClient{
 		socket = new Socket(host, port);
 		out = new PrintWriter(socket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
+		connected = true;
+		q.start();
 	}
 	
 	public void disconnect() throws IOException {
+		connected = false;
 		out.close();
 		in.close();
 		socket.close();
@@ -35,6 +37,10 @@ public class JavaClient{
 		return in.readLine();
 	}
 	
+	public boolean isConnected() {
+		return connected;
+	}
+	
 	//public:
 	public String delimeter;
 	
@@ -44,4 +50,6 @@ public class JavaClient{
 	private BufferedReader in;
 	private String host;
 	private int port;
+	private QueryReceiver q;
+	private boolean connected;
 }
