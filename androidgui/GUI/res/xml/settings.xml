@@ -1,12 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen
         xmlns:android="http://schemas.android.com/apk/res/android">
-
-    <PreferenceCategory
-            android:title="@string/title_show_hide">
         <CheckBoxPreference
                 android:key="checkbox_preference"
                 android:title="@string/title_show_hide_toggle"
                 android:summary="@string/summary_show_hide_toggle" />
-    </PreferenceCategory>
+
 </PreferenceScreen>
