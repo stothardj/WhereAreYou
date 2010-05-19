@@ -2,9 +2,6 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
-import java.util.Iterator;
-import java.util.LinkedList;
-
 
 public class ClientRunner implements Runnable {
 	/*
@@ -21,26 +18,29 @@ public class ClientRunner implements Runnable {
 	
 	@Override
 	public void run() {
-		System.out.println("Client runner is up.");
-		jc = new JavaClient("localhost", 79);
-		try {
-			jc.connect();
-		} catch (UnknownHostException e) {
-			e.printStackTrace();
-		} catch (IOException e) {
-			e.printStackTrace();
-		}
 		
-		TestStructure ts = new TestStructure();
+		AndroidUser jake = new AndroidUser("stothard");
+		AndroidUser brian = new AndroidUser("bagrm");
+		jake.login("cake");
+		brian.login("password");
 		
-		ts.addTest("jake", "Hooray me!");
-		ts.addTest("alex", "I will kill you");
-		ts.addTest("no one", "User not found.");
-		ts.addTest("Failure", "Gibberish");
+		//TODO: Add various tests using functions you create
 		
-		ts.runTests();
+		/*
+		 * I want to easily be able to add tests here so that
+		 * I can repeatedly run them against the server. 
+		 */
 		
 		if(INTERACTIVE) {
+			JavaClient jc = new JavaClient("general", "localhost", 79);
+			try {
+				jc.connect();
+			} catch (UnknownHostException e1) {
+				e1.printStackTrace();
+			} catch (IOException e1) {
+				e1.printStackTrace();
+			}
+			
 			System.out.println("Entered interactive mode.");
 			System.out.println("Enter 'exit' to leave.");
 			
@@ -51,72 +51,20 @@ public class ClientRunner implements Runnable {
 				while(!(fromUser = stdIn.readLine()).equals("exit")) {
 					jc.sendLine(fromUser);
 					System.out.println("Client: "+fromUser);
-					System.out.println("Server: "+jc.readLine());
 				}
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			
 			System.out.println("Leaving interactive mode.");
-		}
-		
-		try {
-			jc.disconnect();
-		} catch (IOException e) {
-			e.printStackTrace();
+			
+			try {
+				jc.disconnect();
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
 		}
 		
 		System.out.println("Client runner is down.");
 	}
-	
-	private class TestStructure {
-		
-		private class Test {
-			public Test(String input, String expected) {
-				this.input = input;
-				this.expected = expected;
-			}
-			
-			public void runTest() {
-				jc.sendLine(input);
-				try {
-					String ret = jc.readLine(); 
-					if(ret.equals(expected)) {
-						System.out.println("Pass: "+input+" returned "+expected);
-					} else {
-						System.out.println("Fail: "+input+" should return "+expected+". Instead returns "+ret);
-					}
-				} catch (IOException e) {
-					e.printStackTrace();
-				}
-				
-			}
-			
-			private String input, expected;
-		}
-		
-		public TestStructure() {
-			tests = new LinkedList<Test>();
-		}
-		
-		public void addTest(String input, String expected) {
-			tests.add(new Test(input, expected));
-		}
-		
-		public void clearTests() {
-			tests.clear();
-		}
-		
-		public void runTests() {
-			Iterator<Test> it = tests.iterator();
-			while(it.hasNext()) {
-				Test ct = it.next();
-				ct.runTest();
-			}
-		}
-		
-		private LinkedList<Test> tests;
-	}
-	
-	private JavaClient jc;
 }

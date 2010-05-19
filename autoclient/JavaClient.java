@@ -2,7 +2,9 @@ import java.io.*;
 import java.net.*;
 
 public class JavaClient{
-	public JavaClient(String host, int port) {
+	public JavaClient(String name, String host, int port) {
+		QueryReceiver q = new QueryReceiver(this, name);
+		q.start();
 		this.host = host;
 		this.port = port;
 		this.delimeter = "\n";
@@ -12,8 +14,6 @@ public class JavaClient{
 		socket = new Socket(host, port);
 		out = new PrintWriter(socket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
-		if(!in.readLine().equals("Connection made!"))
-			System.out.println("Connection not validated!");
 	}
 	
 	public void disconnect() throws IOException {
