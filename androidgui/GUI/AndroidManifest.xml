@@ -25,6 +25,12 @@
 	          <action android:name="android.intent.action.MAIN"></action>
 	       </intent-filter>
     	</activity>
+        <activity android:name="Tabs" android:label="@string/tabs_name">
+	       <intent-filter>
+	          <category android:name="android.intent.category.EMBED"></category>
+	          <action android:name="android.intent.action.MAIN"></action>
+	       </intent-filter>
+    	</activity>
     </application>
  <uses-permission android:name="android.permission.INTERNET"></uses-permission>
  </manifest>

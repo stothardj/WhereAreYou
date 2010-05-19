@@ -92,8 +92,17 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     def getQuery(message):
 
       def parseCreateUser(o):
+        '''
+        users table schema
+        fname - First Name, string
+        lname - Last Name, string
+        UserName - Username, string
+        pw - Password, string (MD5)
+        type - Account Type, enum
+        lastloc - Last Location (lat/lon), point
+        '''
         tempfun = (lambda:
-          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, 0, 0)",
+          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, (0.0, 0.0))",
           (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
           o['Account Type'])))
         self.pool.runInteraction(uniqueUser, o['User Name'], (tempfun, None))
@@ -109,7 +118,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def parseAddZone(o):
         if self.username != None:
-          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
+          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, < ( %f, %f ), %f >)",
           (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
 
         return "Added a zone!"
@@ -152,6 +161,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
+        #TO DO RRR: Fix this to use the circle data type.
         if self.username != None:
           self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
           (o['Lat'], o['Lon'], self.username))
@@ -207,8 +217,23 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         def parseShowZones(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM zonenames")
 
+        #add functions here.
+        def parseEmptyFriends(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE friends")
+          #NOTE: If any other tables reference this table using a foreign key, this will not work.
+          #Instead, use DELETE.
+
+        def parseEmptyUsers(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE users")
+          #Same note as above.
+
+        def parseEmptyZones(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE zonenames")
+          #Same note as above.
+
         test_parser = {'Show Users' : parseShowUsers, 'Show Friends' : parseShowFriends,
-        'Show Zones': parseShowZones}
+                       'Show Zones': parseShowZones, 'Empty Friends': parseEmptyFriends,
+                       'Empty Users': parseEmptyUsers, 'Empty Zones': parseEmptyUsers} 
         parser.update(test_parser)
 
       jd = json.JSONDecoder()
@@ -227,7 +252,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       if self.ALWAYS_RESPOND:
         self.sendLine("Invalid query. Handle this appropriatly!")
       else:
-        print "Invalid query. Handle this appropriatly!"
+        print "Invalid query. Handle this appropriately!"
 
 class gogodeXFactory(protocol.ServerFactory):
   protocol = gogodeXProtocol
@@ -239,3 +264,4 @@ class gogodeXFactory(protocol.ServerFactory):
 
   def logoutUser(self, username):
     del self.loggedin_users[username]
+
