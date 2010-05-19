@@ -54,14 +54,37 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         msg['Response Type']='User Validation'
 
         if message != []: #Invalid user would return empty list
-          msg['Authentication']='Accepted'
+          msg['Success']=True
           self.sendLine(json.dumps(msg))
           return callback()
         else:
-          msg['Authentication']='Failure'
+          msg['Success']=False
           self.sendLine(json.dumps(msg))
 
       d.addCallback(executeFunctionOnSuccess)
+      d.addErrback(onError)
+
+    def uniqueUser(cur, uname, calltuple):
+      (unique, notunique) = calltuple
+      cur.execute("SELECT * FROM users WHERE UserName=E%s", uname)
+      d = cur.fetchall()
+
+      def executeAppropriateFunction(message):
+        msg = {}
+        msg['Response Type']='Pre-existing User'
+        msg['User Name']=uname
+
+        if message == []:
+          msg['Exists']=False
+          self.sendLine(json.dumps(msg))
+          if unique != None:
+            return unique()
+        else:
+          msg['Exists']=True
+          self.sendLine(json.dumps(msg))
+          if notunique != None:
+            return notunique()
+      d.addCallback(executeAppropriateFunction)
       d.addErrback(onError)
 
     #json message -> sql query. Tuple with parameters to be applied
@@ -69,10 +92,20 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     def getQuery(message):
 
       def parseCreateUser(o):
-        #Ryan, what is the best way to keep username unique?
-        self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, 0, 0)",
-        (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
-        o['Account Type']))
+        '''
+        users table schema
+        fname - First Name, string
+        lname - Last Name, string
+        UserName - Username, string
+        pw - Password, string (MD5)
+        type - Account Type, enum
+        lastloc - Last Location (lat/lon), point
+        '''
+        tempfun = (lambda:
+          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, (0.0, 0.0))",
+          (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
+          o['Account Type'])))
+        self.pool.runInteraction(uniqueUser, o['User Name'], (tempfun, None))
         return "Created a user!"
 
       def parseRemoveUser(o):
@@ -85,7 +118,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def parseAddZone(o):
         if self.username != None:
-          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, %f, %f, %f)",
+          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, < ( %f, %f ), %f >)",
           (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
 
         return "Added a zone!"
@@ -97,10 +130,19 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a zone!"
 
       def parseAddFriend(o):
-        #TODO: confirm existence of friend account.
-        if self.username != None:
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
-          self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
+        if self.username != None and self.username != o['Friend Name']:
+          def addFriend():
+            self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
+            self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
+            msg = {}
+            msg['Response Type']='Friend Request'
+            msg['From User']=self.username
+            try:
+              self.factory.loggedin_users[o['Friend Name']].sendLine(json.dumps(msg))
+            except:
+              pass
+            
+          self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, addFriend))
 
         return "Added a friend!"
 
@@ -119,33 +161,35 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
-        self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
-        (o['Lat'], o['Lon'], self.username))
+        #TO DO RRR: Fix this to use the circle data type.
+        if self.username != None:
+          self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
+          (o['Lat'], o['Lon'], self.username))
 
-        def pushPosition(friends):
-          msg = {}
-          msg['Response Type']='Position Update'
-          msg['User Name']=self.username
-          msg['Lat']=o['Lat']
-          msg['Lon']=o['Lon']
-          sentLine = json.dumps(msg)
-          for a in friends:
-            friend = a[0]
-            try:
-              self.factory.loggedin_users[friend].sendLine(sentLine)
-            except:
-              pass
-              #print "Friend", friend, "is not logged in."
+          def pushPosition(friends):
+            msg = {}
+            msg['Response Type']='Position Update'
+            msg['User Name']=self.username
+            msg['Lat']=o['Lat']
+            msg['Lon']=o['Lon']
+            sentLine = json.dumps(msg)
+            for a in friends:
+              friend = a[0]
+              try:
+                self.factory.loggedin_users[friend].sendLine(sentLine)
+              except:
+                pass
+                #print "Friend", friend, "is not logged in."
 
-        def getFriends(cur,query,args):
-          cur.execute(query,args)
-          d = cur.fetchall()
-          d.addCallback(pushPosition)
-          d.addErrback(onError)
+          def getFriends(cur,query,args):
+            cur.execute(query,args)
+            d = cur.fetchall()
+            d.addCallback(pushPosition)
+            d.addErrback(onError)
 
-        self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
+          self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
 
-        return "Updated position!"
+          return "Updated position!"
 
       def parseLogin(o):
         def login():
@@ -173,8 +217,23 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         def parseShowZones(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM zonenames")
 
+        #add functions here.
+        def parseEmptyFriends(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE friends")
+          #NOTE: If any other tables reference this table using a foreign key, this will not work.
+          #Instead, use DELETE.
+
+        def parseEmptyUsers(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE users")
+          #Same note as above.
+
+        def parseEmptyZones(o):
+          self.pool.runInteraction(runQueries, "TRUNCATE TABLE zonenames")
+          #Same note as above.
+
         test_parser = {'Show Users' : parseShowUsers, 'Show Friends' : parseShowFriends,
-        'Show Zones': parseShowZones}
+                       'Show Zones': parseShowZones, 'Empty Friends': parseEmptyFriends,
+                       'Empty Users': parseEmptyUsers, 'Empty Zones': parseEmptyUsers} 
         parser.update(test_parser)
 
       jd = json.JSONDecoder()
@@ -193,7 +252,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       if self.ALWAYS_RESPOND:
         self.sendLine("Invalid query. Handle this appropriatly!")
       else:
-        print "Invalid query. Handle this appropriatly!"
+        print "Invalid query. Handle this appropriately!"
 
 class gogodeXFactory(protocol.ServerFactory):
   protocol = gogodeXProtocol
@@ -205,3 +264,4 @@ class gogodeXFactory(protocol.ServerFactory):
 
   def logoutUser(self, username):
     del self.loggedin_users[username]
+
