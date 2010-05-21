@@ -41,7 +41,7 @@ public class GUI extends Activity {
             	pass = passEd.toString();
             	if(user.length() != 0 && pass.length() != 0)	
             	{
-            		boolean connected = connectToServer();
+            		/*boolean connected = connectToServer();
             		if (connected == false)
             		{
             			CharSequence text = "Unable to Connect to the Server!";
@@ -49,10 +49,10 @@ public class GUI extends Activity {
             			return;
             		}
             		else
-            		{
+            		{*/
             			Intent myIntent = new Intent(view.getContext(), Tabs.class);
             			startActivity(myIntent);
-            		}
+            		//}
             	}
             	else
             	{
