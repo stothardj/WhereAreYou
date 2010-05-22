@@ -6,6 +6,34 @@ Install Twisted 10.0.0, Python 2.6.5 (This will not work with Python 3),
 pgasync, and postgreSQL. Setup tables appropriatly (I will document this
 later).
 
+POSTGRES DATABASE SCHEMA
+
+CREATE TYPE friend_status AS ENUM ('Accepted', 'Unaccepted', 'Pending');
+CREATE TABLE friends (
+	username	varchar(50) PRIMARY KEY,
+	friendname	varchar(50) NOT NULL,
+	status		friend_status NOT NULL
+);
+
+CREATE TYPE account_type AS ENUM ('User')
+CREATE TABLE users (
+	firstname	varchar(50),
+	lastname	varchar(50),
+	username	varchar(50) PRIMARY KEY,
+	password	varchar(50),
+	accounttype	account_type,
+	lastloc		point
+);
+
+#zone should really be a primary key, but an operator must be defined.
+#RRR is looking into it.
+CREATE TABLE zonenames (
+	username	varchar(50) NOT NULL,
+	zonename	varchar(255) NOT NULL,
+	zone		circle
+);
+	
+
 JSON API
 Note: Case sensitive
 
