@@ -10,7 +10,6 @@ import glue
 GENERAL TO DOs:
 - Allow modification of zones.
 - Check for duplicates in everything.
-Sigh.
 '''
 
 class gogodeXProtocol(glue.NeutralLineReceiver):
