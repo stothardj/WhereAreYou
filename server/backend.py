@@ -13,6 +13,12 @@ GENERAL TO DOs:
 - Check for duplicates in everything.
 '''
 
+'''
+TO DO RRR
+- Add zone does not work.
+- Add friend does not work.
+'''
+
 class gogodeXProtocol(glue.NeutralLineReceiver):
 
   username = None
@@ -21,13 +27,14 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
   ALLOW_DEBUG_JSON = True
   ALWAYS_RESPOND = False
 
-  server = os.getlogin()
-  if server == "jake":
-    db="mydb"
-  elif server == "ryan":
-    db="gogodex"
 
   def __init__(self):
+    server = os.getlogin()
+    if server == "jake":
+      db="mydb"
+    elif server == "ryan":
+      db="gogodex"
+      global db
     #TO DO: Change database name, username and password. Password should be configured in a file.
     self.pool = ConnectionPool("pgasync",dbname=db,user=server,password="stupidpassword")
 
@@ -180,7 +187,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def parseUpdateCoord(o):
         if self.username != None:
-          self.pool.runOperation("UPDATE users SET lastloc=(%f, %f) WHERE UserName=E%s",
+          self.pool.runOperation("UPDATE users SET lastloc=point(%f, %f) WHERE UserName=E%s",
           (o['Lat'], o['Lon'], self.username))
 
           def pushPosition(friends):
