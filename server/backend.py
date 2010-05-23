@@ -143,8 +143,8 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         #TO DO: Check for overlapping zones and fail if zones overlap.
         if self.username != None:
           #To RRR: the radius needs to be converted from user units (feet, miles etc.) to GPS. Sigh.
-          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, < ( %f, %f ), %f >), %d, E%s)",
-          (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius'], o['Action'], o['Text']))
+          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, circle '(( %f, %f ), %f)', E%s, E%s)",
+          (self.username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius'], o['Action'], o['Text']))
 
         return "Added a zone!"
 
