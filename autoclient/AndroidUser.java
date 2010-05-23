@@ -17,7 +17,7 @@ public class AndroidUser {
 	
 	// JSON API
 
-	public void creatUser(String first_name, String last_name, String password, String account_type) {
+	public void createUser(String first_name, String last_name, String password, String account_type) {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
 		f.add(new JSONField("Request Type", "Create User", JSONType.STRING));
 		f.add(new JSONField("First Name", first_name, JSONType.STRING));
@@ -38,8 +38,8 @@ public class AndroidUser {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
 		f.add(new JSONField("Request Type", "Add Zone", JSONType.STRING));
 		f.add(new JSONField("Zone Name", zone_name, JSONType.STRING));
-		f.add(new JSONField("Lat", lat, JSONType.STRING));
-		f.add(new JSONField("Lon", lon, JSONType.STRING));
+		f.add(new JSONField("Lat", lat, JSONType.FLOAT));
+		f.add(new JSONField("Lon", lon, JSONType.FLOAT));
 		f.add(new JSONField("Radius", radius, JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
@@ -75,8 +75,8 @@ public class AndroidUser {
 	public void updateCoordinate(String lat, String lon) {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
 		f.add(new JSONField("Request Type", "Update Coordinate", JSONType.STRING));
-		f.add(new JSONField("Lat", lat, JSONType.STRING));
-		f.add(new JSONField("Lon", lon, JSONType.STRING));
+		f.add(new JSONField("Lat", lat, JSONType.FLOAT));
+		f.add(new JSONField("Lon", lon, JSONType.FLOAT));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
 
@@ -106,33 +106,30 @@ public class AndroidUser {
 		f.add(new JSONField("Request Type", "Show Zones", JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
-
-	// server response JSON
-
-	public void userValidation(String success) {
+	
+	public void emptyUsers() {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
-		f.add(new JSONField("Response Type", "User Validation", JSONType.STRING));
-		f.add(new JSONField("Success", success, JSONType.STRING));
+		f.add(new JSONField("Request Type", "Empty Users", JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
 
-	public void positionUpdate(String lat, String lon) {
+	public void emptyFriends() {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
-		f.add(new JSONField("Response Type", "Position Update", JSONType.STRING));
-		f.add(new JSONField("User Name", username, JSONType.STRING));
-		f.add(new JSONField("Lat", lat, JSONType.STRING));
-		f.add(new JSONField("Lon", lon, JSONType.STRING));
+		f.add(new JSONField("Request Type", "Empty Friends", JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
 
-	public void friendRequest(String from_user) {
+	public void emptyZones() {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
-		f.add(new JSONField("Response Type", "Friend Request", JSONType.STRING));
-		f.add(new JSONField("From User", from_user, JSONType.STRING));
+		f.add(new JSONField("Request Type", "Empty Zones", JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
-
-
+	
+	public void emptyAll() {
+		LinkedList<JSONField> f = new LinkedList<JSONField>();
+		f.add(new JSONField("Request Type", "Empty All", JSONType.STRING));
+		sendLine(AndroidUser.createJSONString(f));
+	}	
 	
 	private void sendLine(String message) {
 		System.out.println(username+": "+message);
@@ -161,6 +158,6 @@ public class AndroidUser {
 		ret += "}";
 		return ret;
 	}
-	private String username;
+	String username;
 	JavaClient jc;
 }

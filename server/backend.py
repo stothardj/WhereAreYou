@@ -102,7 +102,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         lastloc - Last Location (lat/lon), point
         '''
         tempfun = (lambda:
-          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, (0.0, 0.0))",
+          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, '(0.0, 0.0)')",
           (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
           o['Account Type'])))
         self.pool.runInteraction(uniqueUser, o['User Name'], (tempfun, None))
@@ -113,7 +113,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           self.pool.runOperation("DELETE FROM users WHERE UserName=E%s", self.username)
           self.pool.runOperation("DELETE FROM friends WHERE UserName=E%s OR FriendName=E%s", (self.username, self.username))
           self.pool.runOperation("DELETE FROM zonenames WHERE UserName=E%s", self.username)
-
+          self.logout()
         return "Removed a user!"
 
       def parseAddZone(o):
@@ -141,7 +141,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               self.factory.loggedin_users[o['Friend Name']].sendLine(json.dumps(msg))
             except:
               pass
-            
+
           self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, addFriend))
 
         return "Added a friend!"
@@ -210,30 +210,43 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM users")
+          return "Show Users"
 
         def parseShowFriends(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM friends")
+          return "Show Friends"
 
         def parseShowZones(o):
           self.pool.runInteraction(runQueries,"SELECT * FROM zonenames")
+          return "Show Zones"
 
         #add functions here.
         def parseEmptyFriends(o):
-          self.pool.runInteraction(runQueries, "TRUNCATE TABLE friends")
+          self.pool.runOperation("TRUNCATE TABLE friends")
           #NOTE: If any other tables reference this table using a foreign key, this will not work.
           #Instead, use DELETE.
+          return "Empty Friends"
 
         def parseEmptyUsers(o):
-          self.pool.runInteraction(runQueries, "TRUNCATE TABLE users")
+          self.pool.runOperation("TRUNCATE TABLE users")
           #Same note as above.
+          return "Empty Users"
 
         def parseEmptyZones(o):
-          self.pool.runInteraction(runQueries, "TRUNCATE TABLE zonenames")
+          self.pool.runOperation("TRUNCATE TABLE zonenames")
           #Same note as above.
+          return "Empty Zones"
+
+        def parseEmptyAll(o):
+          parseEmptyFriends(o)
+          parseEmptyUsers(o)
+          parseEmptyZones(o)
+          return "Empty All"
 
         test_parser = {'Show Users' : parseShowUsers, 'Show Friends' : parseShowFriends,
                        'Show Zones': parseShowZones, 'Empty Friends': parseEmptyFriends,
-                       'Empty Users': parseEmptyUsers, 'Empty Zones': parseEmptyUsers} 
+                       'Empty Users': parseEmptyUsers, 'Empty Zones': parseEmptyUsers,
+                       'Empty All' : parseEmptyAll}
         parser.update(test_parser)
 
       jd = json.JSONDecoder()
