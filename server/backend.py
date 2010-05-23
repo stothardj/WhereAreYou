@@ -5,6 +5,7 @@ from privacyAction import *
 import json
 
 import glue
+import os
 
 '''
 GENERAL TO DOs:
@@ -20,9 +21,15 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
   ALLOW_DEBUG_JSON = True
   ALWAYS_RESPOND = False
 
+  server = os.getlogin()
+  if server == "jake":
+    db="mydb"
+  elif server == "ryan":
+    db="gogodex"
+
   def __init__(self):
     #TO DO: Change database name, username and password. Password should be configured in a file.
-    self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")
+    self.pool = ConnectionPool("pgasync",dbname=db,user=server,password="stupidpassword")
 
   def logout(self):
     if self.username != None:
