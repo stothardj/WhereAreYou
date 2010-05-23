@@ -54,7 +54,6 @@ and user password for the postgres. Change that appropriatly.
 
 Optional: If you want to change the port this runs on, change it in gogodex.tac
 Default is port 79, for no reason.
->>>>>>> 5ee02bb727610d712b069ae3db53231e8e245c7e:server/README
 
 JSON API
 Note: Case sensitive
