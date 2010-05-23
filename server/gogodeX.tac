@@ -8,8 +8,9 @@ from twisted.application import internet, service
 from twisted.internet import reactor, defer
 
 import sys
+import getpass
 #Unfortunatly, the location of the backend module is hardcoded
-sys.path.append('/home/jake/Documents/WhereAreYou/server')
+sys.path.append('/home/%s/Documents/WhereAreYou/server' % getpass.getuser())
 import backend
 
 application = service.Application('gogodeX', uid=1, gid=1)
