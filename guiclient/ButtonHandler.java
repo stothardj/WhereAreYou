@@ -15,11 +15,12 @@ public class ButtonHandler implements ActionListener {
 	public void actionPerformed(ActionEvent ae) {
 		JButton src = ((JButton)ae.getSource());
 		HashMap<String,String[]> fields = new HashMap<String,String[]>();
+		HashMap<String,String[]> multipleChoice = new HashMap<String,String[]>();
 		
 		fields.put("Create User", new String[] {"First Name", "Last Name",
 				"User Name", "Password", "Account Type"} );
 		fields.put("Remove User", new String[] {});
-		fields.put("Add Zone", new String[] {"Zone Name", "Lat", "Lon", "Radius"});
+		fields.put("Add Zone", new String[] {"Zone Name", "Lat", "Lon", "Radius", "Action", "Text"});
 		fields.put("Remove Zone", new String[] {"Zone Name"});
 		fields.put("Add Friend", new String[] {"Friend Name"});
 		fields.put("Accept Friend", new String[] {"Friend Name"});
@@ -34,6 +35,9 @@ public class ButtonHandler implements ActionListener {
 		fields.put("Show Friends", new String[] {});
 		fields.put("Show Zones", new String[] {});
 		
+		multipleChoice.put("Action", new String[] {"SHOWGPS", "SHOWTEXT", "HIDE"});
+		multipleChoice.put("Account Type", new String[] {"User"});
+		
 		fieldPanel.removeAll();
 		currentRequestType = src.getText();
 		String[] arr = fields.get(currentRequestType);
@@ -42,7 +46,32 @@ public class ButtonHandler implements ActionListener {
 			for(String field : arr) {
 				JLabel flabel = new JLabel(field);
 				fieldPanel.add(flabel);
-				fieldPanel.add(new JTextField());
+				if (!(field.equals("Action") || field.equals("Account Type"))) {
+					fieldPanel.add(new JTextField());
+				}
+				else if (field.equals("Action")) {
+					ButtonGroup action = new ButtonGroup();
+					String[] options = multipleChoice.get(field);
+					JPanel radioPanel = new JPanel(new GridLayout(1, 0));
+					for (String option : options) {
+						JRadioButton radio = new JRadioButton(option);
+						action.add(radio);
+						//radio.addActionListener(this);
+						radioPanel.add(radio);
+					}
+					fieldPanel.add(radioPanel, BorderLayout.LINE_START);
+				}
+				else if (field.equals("Account Type")) {
+					ButtonGroup acctType = new ButtonGroup();
+					JPanel radioPanel = new JPanel(new GridLayout(1,0));
+					for (String option : multipleChoice.get(field)) {
+						JRadioButton radio = new JRadioButton(option);
+						acctType.add(radio);
+						//radio.addActionListener(this);
+						radioPanel.add(radio);
+					}
+					fieldPanel.add(radioPanel, BorderLayout.LINE_START);
+				}
 			}
 		} else {
 			fieldPanel.setLayout(new BorderLayout());

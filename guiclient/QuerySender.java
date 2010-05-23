@@ -3,10 +3,10 @@ import java.awt.event.ActionListener;
 import java.io.IOException;
 import java.net.UnknownHostException;
 
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
-import javax.swing.JTextField;
+import java.awt.*;
+
+import javax.swing.*;
+
 
 public class QuerySender implements ActionListener {
 
@@ -22,9 +22,26 @@ public class QuerySender implements ActionListener {
 		String running = "{ \"Request Type\" : \"" + bh.getRequestType() + "\" , ";
 		for(int i=0; i < fieldPanel.getComponentCount() - 1; i += 2) {
 			JLabel tl = (JLabel)fieldPanel.getComponent(i);
-			JTextField tf = (JTextField)fieldPanel.getComponent(i + 1);
 			String tls = tl.getText();
-			String tfs = tf.getText();
+			String tfs = "";
+			//Depending on what the text label is, process it accordingly.
+			if (!(tls.equals("Account Type") || tls.equals("Action"))) {
+				JTextField tf = (JTextField)fieldPanel.getComponent(i + 1);
+				tfs = tf.getText();
+			}
+			else {
+				JPanel radioPanel = (JPanel)fieldPanel.getComponent(i + 1);
+				Component[] components = radioPanel.getComponents();
+				for (int j=0; j < components.length; j++) {
+					JRadioButton rb = (JRadioButton)components[j];
+					if (rb.isSelected()) {
+						tfs = rb.getText();
+						System.out.println(tfs);
+						break;
+					}
+				}
+			}
+			
 			if(tls.equals("Lat") || tls.equals("Lon") || tls.equals("Radius")) //float
 				running += "\""+tls+"\" : "+ tfs + ", ";
 			else //string
