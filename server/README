@@ -37,10 +37,8 @@ CREATE TABLE zonenames (
        to give textual reference to location of the format "at home", "at work".
 
 CREATE TYPE zone_action AS ENUM ('ShowGPS', 'ShowText', 'Hide');
-ALTER TABLE zonenames ADD (
-    action  zone_action,
-    text    varchar(255)
-);
+ALTER TABLE zonenames ADD COLUMN action zone_action;
+ALTER TABLE zonenames ADD COLUMN text varchar(255);
 
 JSON API
 Note: Case sensitive
