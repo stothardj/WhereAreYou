@@ -49,8 +49,9 @@ Fields: First Name, Last Name, User Name, Password, Account Type
 Request Type: Remove User
 Fields: None
 
+#EDITED to add zone preferences.
 Request Type: Add Zone
-Fields: Zone Name, Lat, Lon, Radius
+Fields: Zone Name, Lat, Lon, Radius, Action, Text
 
 Request Type: Remove Zone
 Fields: Zone Name
@@ -85,8 +86,9 @@ SERVER RESPONSE JSON
 Response Type: User Validation
 Fields: Success
 
+#EDITED to add Action specifier along with text or lat/lon.
 Response Type: Position Update
-Fields: User Name, Lat, Lon
+Fields: User Name, Action, Lat, Lon, Text
 
 Response Type: Friend Request
 Fields: From User
