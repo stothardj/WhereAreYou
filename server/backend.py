@@ -13,6 +13,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
   ALWAYS_RESPOND = False
 
   def __init__(self):
+    #TO DO: Change database name, username and password. Password should be configured in a file.
     self.pool = ConnectionPool("pgasync",dbname="mydb",user="jake",password="stupidpassword")
 
   def logout(self):

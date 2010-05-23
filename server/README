@@ -32,6 +32,13 @@ CREATE TABLE zonenames (
 	zonename	varchar(255) NOT NULL,
 	zone		circle
 );
+
+5/22 - Modified table schema to allow for zone privacy actions AND
+       to give textual reference to location of the format "at home", "at work".
+
+CREATE TYPE zone_action AS ENUM ('ShowGPS', 'ShowText', 'Hide');
+ALTER TABLE zonenames ADD COLUMN action zone_action;
+ALTER TABLE zonenames ADD COLUMN text varchar(255);
 	
 HARDCODED CONFIGURATION
 
