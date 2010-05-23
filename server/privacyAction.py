@@ -1,0 +1,1 @@
+SHOWGPS, SHOWTEXT, HIDE = range(3)
