@@ -15,7 +15,10 @@ public class QueryReceiver extends Thread {
 				String s = jc.readLine();
 				System.out.println("Server to "+user+": "+s);
 			} catch (IOException e) {
+				//Note: This may seem ugly, but we want to be able to disconnect at any point
+				System.out.println("This stack trace is supposed to happen ------");
 				e.printStackTrace();
+				System.out.println("The previous stack trace was supposed to happen ------");
 			}
 		}
 		

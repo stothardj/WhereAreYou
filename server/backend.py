@@ -1,8 +1,17 @@
 from twisted.internet import protocol
-from pgasync import ConnectionPool
+from pgasync import ConnectionPool  #Postgres/Twisted interface.
+from privacy import checkZonePrivacy
+from privacyAction import * 
 import json
 
 import glue
+
+'''
+GENERAL TO DOs:
+- Allow modification of zones.
+- Check for duplicates in everything.
+Sigh.
+'''
 
 class gogodeXProtocol(glue.NeutralLineReceiver):
 
@@ -95,10 +104,10 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseCreateUser(o):
         '''
         users table schema
-        fname - First Name, string
-        lname - Last Name, string
-        UserName - Username, string
-        pw - Password, string (MD5)
+        fname - First Name, varchar(50)
+        lname - Last Name, varchar(50)
+        UserName - Username, varchar(50)
+        pw - Password, varchar(50)
         type - Account Type, enum
         lastloc - Last Location (lat/lon), point
         '''
@@ -118,9 +127,11 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a user!"
 
       def parseAddZone(o):
+        #TO DO: Check for overlapping zones and fail if zones overlap.
         if self.username != None:
-          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, < ( %f, %f ), %f >)",
-          (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius']))
+          #To RRR: the radius needs to be converted from user units (feet, miles etc.) to GPS. Sigh.
+          self.pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, < ( %f, %f ), %f >), %d, E%s)",
+          (username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius'], o['Action'], o['Text']))
 
         return "Added a zone!"
 
@@ -162,25 +173,36 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Removed a friend!"
 
       def parseUpdateCoord(o):
-        #TO DO RRR: Fix this to use the circle data type.
         if self.username != None:
-          self.pool.runOperation("UPDATE users SET lat=%f, lon=%f WHERE username=E%s",
+          self.pool.runOperation("UPDATE users SET lastloc=(%f, %f) WHERE UserName=E%s",
           (o['Lat'], o['Lon'], self.username))
 
           def pushPosition(friends):
+            '''
+            WARNING: The Android client will need to accept responses of either
+            1) GPS coordinates
+            2) text containing zone name
+            3) response indicating location is hidden/protected.
+            '''
             msg = {}
             msg['Response Type']='Position Update'
             msg['User Name']=self.username
-            msg['Lat']=o['Lat']
-            msg['Lon']=o['Lon']
+            #Is the user in a zone?
+            action, text, lat, lon = privacy.checkZonePrivacy(self, (o['Lat'], o['Lon']))
+            msg['Action']=action
+            msg['Text']=text
+            msg['Lat']=lat
+            msg['Lon']=lon
             sentLine = json.dumps(msg)
-            for a in friends:
-              friend = a[0]
-              try:
-                self.factory.loggedin_users[friend].sendLine(sentLine)
-              except:
-                pass
-                #print "Friend", friend, "is not logged in."
+            #If user is in a 'hidden' zone, save bandwidth and don't push.
+            if action != HIDE:
+                for a in friends:
+                    friend = a[0]
+                    try:
+                        self.factory.loggedin_users[friend].sendLine(sentLine)
+                    except:
+                        pass
+                        #print "Friend", friend, "is not logged in."
 
           def getFriends(cur,query,args):
             cur.execute(query,args)
