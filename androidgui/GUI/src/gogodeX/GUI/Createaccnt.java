@@ -11,3 +11,20 @@ public class Createaccnt extends Activity{
         setContentView(R.layout.createaccount);
     }
 }
+/*e
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.createaccount);
+}e
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.createaccount);
+}e
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.createaccount);
+}e
+public void onCreate(Bundle savedInstanceState) {
+super.onCreate(savedInstanceState);
+setContentView(R.layout.createaccount);
+}*/
