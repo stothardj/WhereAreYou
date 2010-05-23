@@ -19,8 +19,8 @@ CREATE TYPE account_type AS ENUM ('User')
 CREATE TABLE users (
 	firstname	varchar(50),
 	lastname	varchar(50),
-	username	varchar(50) PRIMARY KEY,
-	password	varchar(50),
+	UserName	varchar(50) PRIMARY KEY,
+	Password	varchar(50),
 	accounttype	account_type,
 	lastloc		point
 );
@@ -28,17 +28,19 @@ CREATE TABLE users (
 #zone should really be a primary key, but an operator must be defined.
 #RRR is looking into it.
 CREATE TABLE zonenames (
-	username	varchar(50) NOT NULL,
-	zonename	varchar(255) NOT NULL,
-	zone		circle
+	UserName	varchar(50) NOT NULL,
+	ZoneName	varchar(255) NOT NULL,
+	zone		circle NOT NULL,
+    action      zone_action NOT NULL,
+    text        varchar(255)
 );
 
 5/22 - Modified table schema to allow for zone privacy actions AND
        to give textual reference to location of the format "at home", "at work".
 
-CREATE TYPE zone_action AS ENUM ('ShowGPS', 'ShowText', 'Hide');
-ALTER TABLE zonenames ADD COLUMN action zone_action;
-ALTER TABLE zonenames ADD COLUMN text varchar(255);
+CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE');
+ALTER TABLE zonenames ADD COLUMN action zone_action not null;
+ALTER TABLE zonenames ADD COLUMN text varchar(255) not null;
 
 JSON API
 Note: Case sensitive
