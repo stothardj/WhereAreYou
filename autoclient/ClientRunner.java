@@ -78,7 +78,7 @@ public class ClientRunner implements Runnable {
 		String fromUser;
 		
 		try {
-			while(!(fromUser = stdIn.readLine()).equals("exit")) {
+			while((fromUser = stdIn.readLine()) != null && !fromUser.equals("exit")) {
 				jc.sendLine(fromUser);
 				System.out.println("Client: "+fromUser);
 			}

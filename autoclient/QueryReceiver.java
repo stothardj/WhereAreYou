@@ -9,11 +9,13 @@ public class QueryReceiver extends Thread {
 	
 	@Override
 	public void run() {
-		
 		while(jc.isConnected()) { //I know there is a better way, look into later
 			try {
 				String s = jc.readLine();
-				System.out.println("Server to "+user+": "+s);
+				if(s == null)
+					jc.disconnect();
+				else
+					System.out.println("Server to "+user+": "+s);
 			} catch (IOException e) {
 				//Note: This may seem ugly, but we want to be able to disconnect at any point
 				System.out.println("This stack trace is supposed to happen ------");
