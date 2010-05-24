@@ -116,6 +116,9 @@ Fields: Success
 Response Type: Created User
 Fields: User Name, Success
 
+Response Type: Friend Requested
+Fields: Friend Name, Success
+
 #EDITED to add Action specifier along with text or lat/lon.
 Response Type: Position Update
 Fields: User Name, Action, Lat, Lon, Text
