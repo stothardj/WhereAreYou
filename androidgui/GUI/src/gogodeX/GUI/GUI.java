@@ -30,58 +30,67 @@ public class GUI extends Activity {
 	private JSONStringer JSONUser;
 	private static LocationManager LM;
 	private JSONObject JSONValidate;
+	private EditText userName;
+    private EditText password;
+    private Context context;
+    private int duration;
+    private Intent startUpdatingCoordinates;
+    private boolean connected;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         Button next = (Button) findViewById(R.id.ok);
-        
-        final EditText userName = (EditText) findViewById(R.id.username);
-        final EditText password = (EditText) findViewById(R.id.password);
-        final Context context = getApplicationContext();
-        final int duration = Toast.LENGTH_SHORT;
-        final Intent startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
+        userName = (EditText) findViewById(R.id.username);
+        password = (EditText) findViewById(R.id.password);
+        context = getApplicationContext();
+        duration = Toast.LENGTH_SHORT;
+        startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
         client = new JavaClient("169.232.101.67", 79);
-        LM = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
+		connected = connectToServer();
+       // LM = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	userEd = userName.getText();
-            	passEd = password.getText();
-            	user = userEd.toString();
-            	pass = passEd.toString();
-            	if(user.length() != 0 && pass.length() != 0)	
+            	if(connected != false)
             	{
-            		boolean connected = connectToServer();
-            		if (connected == false)
-            		{
-            			CharSequence text = "Unable to Connect to the Server!";
-            			Toast.makeText(context, text, duration).show();
-            			return;
-            		}
-            		boolean validated = validateUser();
-            		if(validated == false)
-            		{
-            			CharSequence text = "Sorry, User Name and/or Password not Found!";
-            			Toast.makeText(context, text, duration).show();
-            			return;	
-            		}
-            		
-            	    startService(startUpdatingCoordinates);
-            	    
-            		Intent myIntent = new Intent(view.getContext(), Tabs.class);
-            		startActivity(myIntent);
+	            	userEd = userName.getText();
+	            	passEd = password.getText();
+	            	user = userEd.toString();
+	            	pass = passEd.toString();
+	            	if(user.length() != 0 && pass.length() != 0)	
+	            	{
+	            		boolean validated = validateUser();
+	            		if(validated == false)
+	            		{
+	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
+	            			Toast.makeText(context, text, duration).show();
+	            			return;	
+	            		}
+	            		
+	            	    startService(startUpdatingCoordinates);
+	            	    
+	            		Intent myIntent = new Intent(view.getContext(), Tabs.class);
+	            		startActivity(myIntent);
+	            	}
+	            	else
+	            	{
+	            		CharSequence text = "Please Input a User Name and Password!";
+	            		Toast.makeText(context, text, duration).show();	
+	            		return;	
+	            	}
             	}
             	else
             	{
-            		CharSequence text = "Please Input a User Name and Password!";
-            		Toast.makeText(context, text, duration).show();	
-            		return;	
+            		connected = connectToServer();
+        			CharSequence text = "Unable to Connect to the Server!";
+        			Toast.makeText(context, text, duration).show();  
             	}
-            }
-         });    
+        		
+            	}
+            });    
       }
     
     private boolean connectToServer()
@@ -113,7 +122,9 @@ public class GUI extends Activity {
 			client.sendLine(JSONUser.toString());
 			String response = client.readLine();
 			JSONValidate = new JSONObject(response);
-			if(JSONValidate.get("Response Type") == "User Validation" && JSONValidate.getBoolean("Success") == true)
+			String responseType = JSONValidate.getString("Response Type");
+			boolean isValidated = JSONValidate.getBoolean("Success");
+			if(responseType.equals("User Validation") && isValidated == true)
 			{
 				return true;	
 			}
@@ -122,8 +133,9 @@ public class GUI extends Activity {
 				return false;
 			}	
 		} 
-    	catch (JSONException e) 
+    	catch (JSONException e1) 
 		{
+    		e1.printStackTrace();
     		return false;			
 		}
     	catch (IOException e)
@@ -134,9 +146,9 @@ public class GUI extends Activity {
     	
     }
     
-    public static void getClient(JavaClient client)
+    public static JavaClient getClient()
     {
-    	client = GUI.client;
+    	return client;
     }
     
     public static void getLM(LocationManager LM)

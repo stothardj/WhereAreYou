@@ -4,6 +4,7 @@ import java.io.IOException;
 import java.net.*;
 
 import android.app.Service;
+import android.content.Context;
 import android.content.Intent;
 import android.location.Location;
 import android.location.LocationListener;
@@ -17,13 +18,13 @@ import org.json.*;
 public class GPSUpdater extends Service {
 
 	//LocationManager to update GPS coordinates
-	private static LocationManager LM = null;
+	private LocationManager LM = null;
 	//TextView for debug printing
 	private TextView TV = null;
 	//Static activity instance for activity data access
 	private static GUI gui;
 	//JavaClient to connect to the twisted server
-	private static JavaClient client;
+	private JavaClient client;
 	//private RspHandler handler;
 	private Thread t;
 	//JSONStringer to parse a string into a json string
@@ -40,8 +41,9 @@ public class GPSUpdater extends Service {
 	public void onCreate()
 	{
 		//Get the LocationManager and TextView from the main activity
-		GUI.getClient(client);
-		GUI.getLM(LM);
+		LM = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
+		client = GUI.getClient();
+		//GUI.getLM(LM);
 		//Start the main GPS updating loop
 		GPSHandler();
 	}
@@ -92,7 +94,6 @@ public class GPSUpdater extends Service {
 								// TODO Auto-generated catch block
 								e.printStackTrace();
 							}
-	                    	TV.append(coordinates.toString());
 	                    	//Send the parsed JSON update coordinates request
 								client.sendLine(coordinates.toString());
 	                    } 
