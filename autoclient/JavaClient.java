@@ -25,7 +25,11 @@ public class JavaClient{
 	}
 	
 	protected void finalize() throws Throwable {
-		disconnect();
+		try {
+			disconnect();
+		} finally {
+			super.finalize();
+		}
 	}
 	
 	public void sendLine(String message) {

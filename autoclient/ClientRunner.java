@@ -25,23 +25,26 @@ public class ClientRunner implements Runnable {
 		}
 	}
 	
-	public void runTests() {
+	public void runTests(int delay) {
 		AndroidUser jake = new AndroidUser("stothard");
 		AndroidUser brian = new AndroidUser("bagrm");
 		AndroidUser alex = new AndroidUser("fork");
 		jake.emptyAll();
+		
+		ClientRunner.pause(delay);
+		
 		jake.createUser("Jake", "Stothard", "cake", "User");
 		brian.createUser("Brian", "Garfield", "password", "User");
 		alex.createUser("Alex", "Farkas", "knife", "User");
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
 		
 		jake.login("cake");
 		brian.login("password");		
 		alex.login("spoon");
 		alex.login("knife");
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
 		
 		jake.addFriend("not here");
 		jake.addFriend("fork");
@@ -49,19 +52,23 @@ public class ClientRunner implements Runnable {
 		jake.addZone("Work", "103.4", "-7.04", "103.1", "SHOWGPS", "Playing on the computer");
 		
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
 
 		jake.updateCoordinate("3", "4.2");
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
 		
 		alex.acceptFriend("stothard");
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
 		
 		jake.updateCoordinate("5.1", "-1.2");
 		
-		ClientRunner.pause(2000);
+		ClientRunner.pause(delay);
+		
+		jake.disconnect();
+		alex.disconnect();
+		brian.disconnect();
 	}
 	
 	public void interactiveMode() {
@@ -101,7 +108,7 @@ public class ClientRunner implements Runnable {
 	@Override
 	public void run() {
 		
-		runTests();
+		runTests(5000);
 		
 		if(INTERACTIVE) {
 			interactiveMode();

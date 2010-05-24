@@ -15,6 +15,22 @@ public class AndroidUser {
 		}
 	}
 	
+	public void disconnect() {
+		try {
+			jc.disconnect();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+	
+	protected void finalize() throws Throwable {
+		try {
+			jc.disconnect();
+		} finally {
+			super.finalize();
+		}
+	}
+	
 	// JSON API
 
 	public void createUser(String first_name, String last_name, String password, String account_type) {
