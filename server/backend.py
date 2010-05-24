@@ -192,6 +192,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               print "Action is hide."
 
           self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'").addCallback(pushPosition)
+
           return "Updated position!"
 
       def parseLogin(o):
