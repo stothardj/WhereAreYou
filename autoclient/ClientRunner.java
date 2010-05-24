@@ -43,13 +43,14 @@ public class ClientRunner implements Runnable {
 		
 		ClientRunner.pause(2000);
 		
-
 		jake.addFriend("not here");
 		jake.addFriend("fork");
+		jake.addZone("Home", "13.4", "-7.4", "13.1", "SHOWTEXT", "I am asleep");
+		jake.addZone("Work", "103.4", "-7.04", "103.1", "SHOWGPS", "Playing on the computer");
+		
 		
 		ClientRunner.pause(2000);
 
-		/*
 		jake.updateCoordinate("3", "4.2");
 		
 		ClientRunner.pause(2000);
@@ -61,7 +62,6 @@ public class ClientRunner implements Runnable {
 		jake.updateCoordinate("5.1", "-1.2");
 		
 		ClientRunner.pause(2000);
-		*/
 	}
 	
 	public void interactiveMode() {

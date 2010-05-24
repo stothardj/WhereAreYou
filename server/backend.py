@@ -138,6 +138,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             else:
               msg['Success']=True
               self.sendLine(json.dumps(msg))
+              _addFriend()
 
           self.pool.runQuery("SELECT * FROM users WHERE UserName=E%s", o['Friend Name']).addCallback(_checkFriendExists)
 
@@ -159,41 +160,56 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def parseUpdateCoord(o):
         if self.username != None:
+
           self.pool.runOperation("UPDATE users SET lastloc=point(%f, %f) WHERE UserName=E%s",
           (o['Lat'], o['Lon'], self.username))
 
-          def pushPosition(friends):
+          def _pushPosition(friends, action, lat, lon, text):
+            msg = {}
+            msg['Response Type']='Position Update'
+            msg['User Name']=self.username
+            msg['Action']=action
+            if action == 'SHOWTEXT':
+              msg['Text']=text
+            else:
+              msg['Text']='Ignore me'
+
+            if action == 'SHOWGPS':
+              msg['Lat']=lat
+              msg['Lon']=lon
+            else:
+              msg['Lat']=0
+              msg['Lon']=0
+
+            sentLine = json.dumps(msg)
+
+            for a in friends:
+              friend = a[0]
+              try:
+                self.factory.loggedin_users[friend].sendLine(sentLine)
+              except:
+                pass
+                #print "Friend", friend, "is not logged in."
+
+          def _checkPrivacy(zone):
             '''
             WARNING: The Android client will need to accept responses of either
             1) GPS coordinates
             2) text containing zone name
             3) response indicating location is hidden/protected.
             '''
-            msg = {}
-            msg['Response Type']='Position Update'
-            msg['User Name']=self.username
-            #Is the user in a zone?
-            action, text, lat, lon = privacy.checkZonePrivacy(self, (o['Lat'], o['Lon']))
-            msg['Action']=action
-            msg['Text']=text
-            msg['Lat']=lat
-            msg['Lon']=lon
-            sentLine = json.dumps(msg)
-            #If user is in a 'hidden' zone, save bandwidth and don't push.
+
+            text = zone[0][1]
+            action = zone[0][1]
+
             if action != HIDE:
-              for a in friends:
-                friend = a[0]
-                try:
-                  self.factory.loggedin_users[friend].sendLine(sentLine)
-                except:
-                  pass
-                  #print "Friend", friend, "is not logged in."
-            else:
-              print "Action is hide."
+              self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username).addCallback(_pushPosition, action, o['Lat'], o['Lon'], text)
 
-          self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'").addCallback(pushPosition)
+          self.pool.runQuery("SELECT zonename, action FROM zonenames WHERE UserName=E%s AND point(%f, %f) <@ zone LIMIT 1", (self.username, o['Lat'], o['Lon'])).addCallback(_checkPrivacy)
 
-          return "Updated position!"
+
+
+        return "Updated position!"
 
       def parseLogin(o):
         def login():

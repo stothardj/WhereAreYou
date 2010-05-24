@@ -34,13 +34,15 @@ public class AndroidUser {
 		sendLine(AndroidUser.createJSONString(f));		
 	}
 
-	public void addZone(String zone_name, String lat, String lon, String radius) {
+	public void addZone(String zone_name, String lat, String lon, String radius, String action, String text) {
 		LinkedList<JSONField> f = new LinkedList<JSONField>();
 		f.add(new JSONField("Request Type", "Add Zone", JSONType.STRING));
 		f.add(new JSONField("Zone Name", zone_name, JSONType.STRING));
 		f.add(new JSONField("Lat", lat, JSONType.FLOAT));
 		f.add(new JSONField("Lon", lon, JSONType.FLOAT));
-		f.add(new JSONField("Radius", radius, JSONType.STRING));
+		f.add(new JSONField("Radius", radius, JSONType.FLOAT));
+		f.add(new JSONField("Action", action, JSONType.STRING));
+		f.add(new JSONField("Text", text, JSONType.STRING));
 		sendLine(AndroidUser.createJSONString(f));		
 	}
 
