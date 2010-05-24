@@ -30,7 +30,7 @@ public class GPSUpdater extends Service {
 	//JSONStringer to parse a string into a json string
 	private JSONStringer coordinates;
 	//Holds the user's current Location
-	private Location location;
+	private static Location location;
 	//Variables for holding latitude and longitude values
 	private static double latitude;
 	private static double longitude;
@@ -117,6 +117,11 @@ public class GPSUpdater extends Service {
 	public IBinder onBind(Intent intent) {
 		// TODO Auto-generated method stub
 		return null;
+	}
+	
+	public static Location getLocation()
+	{
+		return location;
 	}
 
 }

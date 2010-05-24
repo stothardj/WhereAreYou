@@ -1,6 +1,7 @@
 package gogodeX.GUI;
 
 import java.io.IOException;
+import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.json.JSONException;
@@ -42,15 +43,14 @@ public class GUI extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         Button next = (Button) findViewById(R.id.ok);
+        connected = false;
         userName = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         context = getApplicationContext();
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("169.232.101.67", 79);
-		connected = connectToServer();
-       // LM = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
+        client = new JavaClient("128.97.244.16", 79);
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -84,9 +84,21 @@ public class GUI extends Activity {
             	}
             	else
             	{
-            		connected = connectToServer();
-        			CharSequence text = "Unable to Connect to the Server!";
-        			Toast.makeText(context, text, duration).show();  
+	            	userEd = userName.getText();
+	            	passEd = password.getText();
+	            	user = userEd.toString();
+	            	pass = passEd.toString();
+	            	connected = connectToServer();
+	            	if(user.length() != 0 && pass.length() != 0)	
+	            	{
+	            		CharSequence text = "Unable to Connect to the Server!";
+	            		Toast.makeText(context, text, duration).show();
+	            	}
+	            	else
+	            	{
+	            		CharSequence text = "Please Input a User Name and Password!";
+	            		Toast.makeText(context, text, duration).show();
+	            	}
             	}
         		
             	}
@@ -102,10 +114,12 @@ public class GUI extends Activity {
     	catch (UnknownHostException e) 
     	{
     		return false;
-		} catch (IOException e) 
+		} 
+    	catch (IOException e) 
 		{
 			return false;
 		}
+		
 		return true;
     }
     

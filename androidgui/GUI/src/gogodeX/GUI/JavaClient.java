@@ -10,8 +10,10 @@ public class JavaClient{
 		this.delimeter = "\n";
 	}
 	
-	public void connect() throws UnknownHostException, IOException {
-		socket = new Socket(host, port);
+	public void connect() throws UnknownHostException, IOException, SocketTimeoutException {
+		socket = new Socket();
+		socketAddress = new InetSocketAddress(host, port);
+		socket.connect(socketAddress, 5000);
 		out = new PrintWriter(socket.getOutputStream(), true);
 		in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
 		//if(!in.readLine().equals("Connection made!"))
@@ -42,6 +44,7 @@ public class JavaClient{
 	
 	//private:
 	private Socket socket;
+	private InetSocketAddress socketAddress;
 	private PrintWriter out;
 	private BufferedReader in;
 	private String host;
