@@ -36,7 +36,6 @@ public class QuerySender implements ActionListener {
 					JRadioButton rb = (JRadioButton)components[j];
 					if (rb.isSelected()) {
 						tfs = rb.getText();
-						System.out.println(tfs);
 						break;
 					}
 				}
