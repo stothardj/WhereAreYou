@@ -32,6 +32,7 @@
         android:layout_alignParentRight="true"
         android:layout_marginLeft="10dip"
         android:text="@string/login_button" />
+        android:layout_below="@id/password_label" android:inputType="textPassword"/>
     <Button
         android:id="@+id/create"
         android:layout_width="wrap_content"

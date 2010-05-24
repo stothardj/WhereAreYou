@@ -3,12 +3,14 @@
     <string name="app_name">GUI</string>
     <string name="mapActivity_name">Map Activity</string>
     <string name="settingActivity_name">Map Activity</string>
+    <string name="createActivity_name">Create Activity</string>
     <string name="tabs_name">Tabs</string>
-
+	<string name="createaccount_name">Createaccnt</string>
+	
     <string name="username_prompt">Username: </string>
     <string name="password_prompt">Password: </string>
     <string name="login_button">Login</string>
-
+    <string name="create_button">Create Account</string>
     <string name="title_show_hide_toggle">Show/Hide</string>
     <string name="summary_show_hide_toggle">Click to toggle between show and hide.</string>
 <string name="title_polling">Polling Frequency</string>

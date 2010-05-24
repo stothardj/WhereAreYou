@@ -25,6 +25,7 @@ public class GUI extends Activity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         Button next = (Button) findViewById(R.id.ok);
+        Button creation = (Button) findViewById(R.id.create);
         
         final EditText userName = (EditText) findViewById(R.id.username);
         final EditText password = (EditText) findViewById(R.id.password);
@@ -32,7 +33,14 @@ public class GUI extends Activity {
         final int duration = Toast.LENGTH_SHORT;
         
         client = new JavaClient("127.0.0.1", 79);
-        
+        creation.setOnClickListener(new View.OnClickListener(){
+        	public void onClick(View view) {
+        		Intent myIntent = new Intent(view.getContext(), Createaccnt.class);
+        		startActivity(myIntent);
+        	}
+        	
+        	
+        });
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
             	userEd = userName.getText();
@@ -63,7 +71,7 @@ public class GUI extends Activity {
             }
          });    
       }
-    
+    	
     private boolean connectToServer(){
     	try 
     	{
