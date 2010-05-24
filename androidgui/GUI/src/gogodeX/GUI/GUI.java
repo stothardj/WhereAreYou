@@ -50,7 +50,13 @@ public class GUI extends Activity {
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("128.97.244.16", 79);
+        client = new JavaClient("169.232.101.67", 79);
+        connected = connectToServer();
+        if(connected == false)
+        {
+        	CharSequence text = "Unable to Connect to the Server! Connection will occur upon logging in.";
+        	Toast.makeText(context, text, duration).show();
+        }
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {

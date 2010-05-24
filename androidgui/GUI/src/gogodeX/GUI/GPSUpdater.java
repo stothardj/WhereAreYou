@@ -43,6 +43,7 @@ public class GPSUpdater extends Service {
 		//Get the LocationManager and TextView from the main activity
 		LM = (LocationManager) getSystemService(Context.LOCATION_SERVICE); 
 		client = GUI.getClient();
+		location = null;
 		//GUI.getLM(LM);
 		//Start the main GPS updating loop
 		GPSHandler();
@@ -121,7 +122,16 @@ public class GPSUpdater extends Service {
 	
 	public static Location getLocation()
 	{
-		return location;
+		if(location != null)
+		{
+			return location;
+		}
+		else
+		{
+			location.setLatitude(0.0);
+			location.setLongitude(0.0);
+			return location;
+		}
 	}
 
 }
