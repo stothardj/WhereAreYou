@@ -88,11 +88,12 @@ public class GUI extends Activity {
 	            	passEd = password.getText();
 	            	user = userEd.toString();
 	            	pass = passEd.toString();
-	            	connected = connectToServer();
 	            	if(user.length() != 0 && pass.length() != 0)	
 	            	{
+	            		connected = connectToServer();
 	            		CharSequence text = "Unable to Connect to the Server!";
 	            		Toast.makeText(context, text, duration).show();
+	            		return;
 	            	}
 	            	else
 	            	{
