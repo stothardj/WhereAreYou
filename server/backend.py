@@ -201,10 +201,9 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               text = zone[0][1]
               action = zone[0][1]
             except:
-              #BUG Here. Where is the actual coordinate??? That should be pushed.
-              text = ""             #Empty string is fine.
-              action = "SHOWGPS"    #Really, this depends on whether the user set Show or Hide in the 
-                                    #Android app. Can someone check this?
+              text = ""
+              #TODO: Have master setting in users table
+              action = "SHOWGPS"
 
             if action != 'HIDE':
               self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username).addCallback(_pushPosition, action, o['Lat'], o['Lon'], text)
