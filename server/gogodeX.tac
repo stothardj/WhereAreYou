@@ -9,7 +9,7 @@ from twisted.internet import reactor, defer
 
 import sys
 #Unfortunatly, the location of the backend module is hardcoded
-sys.path.append('/home/jake/Documents/WhereAreYou/server')
+sys.path.append('/Users/bagrm/WhereAreYou/server')
 import backend
 
 application = service.Application('gogodeX', uid=1, gid=1)
