@@ -216,6 +216,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
                     except:
                         pass
                         #print "Friend", friend, "is not logged in."
+	    return "Pushed location!"
 
           def getFriends(cur,query,args):
             cur.execute(query,args)
