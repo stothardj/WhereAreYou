@@ -56,59 +56,8 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
   def neutralLineReceived(self, line):
     print "Received query for: "+line
 
-    def onError(err):
-      return 'Internal error in server'
-
     def writeResponse(message):
       self.sendLine(str(message))
-
-    def runQueries(cur,query,args):
-      cur.execute(query,args)
-      d = cur.fetchall()
-      d.addCallback(writeResponse)
-      d.addErrback(onError)
-
-    def validateUser(cur, o, callback):
-      cur.execute("SELECT * FROM users WHERE UserName=E%s AND Password=E%s", (o['User Name'], o['Password']))
-      d = cur.fetchall()
-
-      def executeFunctionOnSuccess(message):
-        msg = {}
-        msg['Response Type']='User Validation'
-
-        if message != []: #Invalid user would return empty list
-          msg['Success']=True
-          self.sendLine(json.dumps(msg))
-          return callback()
-        else:
-          msg['Success']=False
-          self.sendLine(json.dumps(msg))
-
-      d.addCallback(executeFunctionOnSuccess)
-      d.addErrback(onError)
-
-    def uniqueUser(cur, uname, calltuple):
-      (unique, notunique) = calltuple
-      cur.execute("SELECT * FROM users WHERE UserName=E%s", uname)
-      d = cur.fetchall()
-
-      def executeAppropriateFunction(message):
-        msg = {}
-        msg['Response Type']='Pre-existing User'
-        msg['User Name']=uname
-
-        if message == []:
-          msg['Exists']=False
-          self.sendLine(json.dumps(msg))
-          if unique != None:
-            return unique()
-        else:
-          msg['Exists']=True
-          self.sendLine(json.dumps(msg))
-          if notunique != None:
-            return notunique()
-      d.addCallback(executeAppropriateFunction)
-      d.addErrback(onError)
 
     #json message -> sql query. Tuple with parameters to be applied
     #separate so that pgasync can handle sql injection
@@ -124,11 +73,22 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         type - Account Type, enum
         lastloc - Last Location (lat/lon), point
         '''
-        tempfun = (lambda:
-          self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, '(0.0, 0.0)')",
-          (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
-          o['Account Type'])))
-        self.pool.runInteraction(uniqueUser, o['User Name'], (tempfun, None))
+
+        def _createUser(users):
+          msg = {}
+          msg['Response Type']='Created User'
+          msg['User Name']=o['User Name']
+          if users == []:
+            msg['Success'] = True
+            self.sendLine(json.dumps(msg))
+            self.pool.runOperation("INSERT INTO users VALUES (E%s, E%s, E%s, E%s, E%s, '(0.0, 0.0)')",
+              (o['First Name'], o['Last Name'], o['User Name'], o['Password'],
+              o['Account Type']))
+          else:
+            msg['Success'] = False
+            self.sendLine(json.dumps(msg))
+        self.pool.runQuery("SELECT * FROM users WHERE UserName=E%s", o['User Name']).addCallback(_createUser)
+
         return "Created a user!"
 
       def parseRemoveUser(o):
@@ -156,7 +116,8 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       def parseAddFriend(o):
         if self.username != None and self.username != o['Friend Name']:
-          def addFriend():
+
+          def _addFriend():
             self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Pending')", (self.username, o['Friend Name']))
             self.pool.runOperation("INSERT INTO friends VALUES (E%s, E%s, 'Unaccepted')", (o['Friend Name'], self.username))
             msg = {}
@@ -167,7 +128,18 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             except:
               pass
 
-          self.pool.runInteraction(uniqueUser, o['Friend Name'], (None, addFriend))
+          def _checkFriendExists(users):
+            msg = {}
+            msg['Response Type']='Friend Requested'
+            msg['Friend Name']=o['Friend Name']
+            if users == []:
+              msg['Success']=False
+              self.sendLine(json.dumps(msg))
+            else:
+              msg['Success']=True
+              self.sendLine(json.dumps(msg))
+
+          self.pool.runQuery("SELECT * FROM users WHERE UserName=E%s", o['Friend Name']).addCallback(_checkFriendExists)
 
         return "Added a friend!"
 
@@ -209,22 +181,17 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             sentLine = json.dumps(msg)
             #If user is in a 'hidden' zone, save bandwidth and don't push.
             if action != HIDE:
-                for a in friends:
-                    friend = a[0]
-                    try:
-                        self.factory.loggedin_users[friend].sendLine(sentLine)
-                    except:
-                        pass
-                        #print "Friend", friend, "is not logged in."
+              for a in friends:
+                friend = a[0]
+                try:
+                  self.factory.loggedin_users[friend].sendLine(sentLine)
+                except:
+                  pass
+                  #print "Friend", friend, "is not logged in."
+            else:
+              print "Action is hide."
 
-          def getFriends(cur,query,args):
-            cur.execute(query,args)
-            d = cur.fetchall()
-            d.addCallback(pushPosition)
-            d.addErrback(onError)
-
-          self.pool.runInteraction(getFriends,"SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username)
-
+          self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'").addCallback(pushPosition)
           return "Updated position!"
 
       def parseLogin(o):
@@ -235,7 +202,20 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           self.factory.loginUser(o['User Name'], self)
           print "User name is now ", self.username
 
-        self.pool.runInteraction(validateUser, o, login)
+        def validateUser(users):
+          msg = {}
+          msg['Response Type']='User Validation'
+
+          if users != []: #Invalid user would return empty list
+            msg['Success']=True
+            self.sendLine(json.dumps(msg))
+            login()
+          else:
+            msg['Success']=False
+            self.sendLine(json.dumps(msg))
+
+        self.pool.runQuery("SELECT * FROM users WHERE UserName=E%s AND Password=E%s", (o['User Name'], o['Password'])).addCallback(validateUser)
+
         return "Logged in!"
 
       parser = {'Create User': parseCreateUser, 'Remove User': parseRemoveUser,
@@ -245,13 +225,13 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):
-          self.pool.runInteraction(runQueries,"SELECT * FROM users")
+          self.pool.runQuery("SELECT * FROM users").addCallback(writeResponse)
 
         def parseShowFriends(o):
-          self.pool.runInteraction(runQueries,"SELECT * FROM friends")
+          self.pool.runQuery("SELECT * FROM friends").addCallback(writeResponse)
 
         def parseShowZones(o):
-          self.pool.runInteraction(runQueries,"SELECT * FROM zonenames")
+          self.pool.runQuery("SELECT * FROM zonenames").addCallback(writeResponse)
 
         #add functions here.
         def parseEmptyFriends(o):
