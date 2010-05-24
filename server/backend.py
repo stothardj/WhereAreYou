@@ -1,7 +1,5 @@
 from twisted.internet import protocol
 from pgasync import ConnectionPool  #Postgres/Twisted interface.
-from privacy import checkZonePrivacy
-from privacyAction import *
 import json
 
 import glue
@@ -199,10 +197,14 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             3) response indicating location is hidden/protected.
             '''
 
-            text = zone[0][1]
-            action = zone[0][1]
+            try:
+              text = zone[0][1]
+              action = zone[0][1]
+            except:
+              text = "The World"
+              action = "SHOWTEXT"
 
-            if action != HIDE:
+            if action != 'HIDE':
               self.pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username).addCallback(_pushPosition, action, o['Lat'], o['Lon'], text)
 
           self.pool.runQuery("SELECT zonename, action FROM zonenames WHERE UserName=E%s AND point(%f, %f) <@ zone LIMIT 1", (self.username, o['Lat'], o['Lon'])).addCallback(_checkPrivacy)
