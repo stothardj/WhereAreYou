@@ -11,4 +11,6 @@
 
     <string name="title_show_hide_toggle">Show/Hide</string>
     <string name="summary_show_hide_toggle">Click to toggle between show and hide.</string>
+<string name="title_polling">Polling Frequency</string>
+<string name="summary_polling">Select your desired polling frequency.</string>
 </resources>

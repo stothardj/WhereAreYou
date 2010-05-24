@@ -3,8 +3,57 @@ interfacing with this server.
 
 INSTALL
 Install Twisted 10.0.0, Python 2.6.5 (This will not work with Python 3),
-pgasync, and postgreSQL. Setup tables appropriatly (I will document this
-later).
+pgasync, and postgreSQL. Setup postgres user, database, and tables appropriatly.
+Change hardcoded details for configuration.
+
+POSTGRES DATABASE SCHEMA
+
+CREATE TYPE friend_status AS ENUM ('Accepted', 'Unaccepted', 'Pending');
+CREATE TABLE friends (
+	username	varchar(50) PRIMARY KEY,
+	friendname	varchar(50) NOT NULL,
+	status		friend_status NOT NULL
+);
+
+CREATE TYPE account_type AS ENUM ('User')
+CREATE TABLE users (
+	firstname	varchar(50),
+	lastname	varchar(50),
+	UserName	varchar(50) PRIMARY KEY,
+	Password	varchar(50),
+	accounttype	account_type,
+	lastloc		point
+);
+
+#zone should really be a primary key, but an operator must be defined.
+#RRR is looking into it.
+CREATE TABLE zonenames (
+	UserName	varchar(50) NOT NULL,
+	ZoneName	varchar(255) NOT NULL,
+	zone		circle NOT NULL,
+    action      zone_action NOT NULL,
+    text        varchar(255)
+);
+
+5/22 - Modified table schema to allow for zone privacy actions AND
+       to give textual reference to location of the format "at home", "at work".
+
+CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE');
+ALTER TABLE zonenames ADD COLUMN action zone_action not null;
+ALTER TABLE zonenames ADD COLUMN text varchar(255) not null;
+	
+HARDCODED CONFIGURATION
+
+The file gogodex.tac has the location of the backend module hardcoded in.
+This is necessary because you do not run this using the python command but
+using the twistd command, which is located somewhere else. Change this file
+location appropriatly.
+
+The top __init__ function in backend.py specifies the database name, username,
+and user password for the postgres. Change that appropriatly.
+
+Optional: If you want to change the port this runs on, change it in gogodex.tac
+Default is port 79, for no reason.
 
 JSON API
 Note: Case sensitive
@@ -15,8 +64,9 @@ Fields: First Name, Last Name, User Name, Password, Account Type
 Request Type: Remove User
 Fields: None
 
+#EDITED to add zone preferences.
 Request Type: Add Zone
-Fields: Zone Name, Lat, Lon, Radius
+Fields: Zone Name, Lat, Lon, Radius, Action, Text
 
 Request Type: Remove Zone
 Fields: Zone Name
@@ -47,12 +97,31 @@ Fields: None
 Request Type: Show Zones
 Fields: None
 
+Request Type: Empty All
+Fields: None
+
+Request Type: Empty Users
+Fields: None
+
+Request Type: Empty Friends
+Fields: None
+
+Request Type: Empty Zones
+Fields: None
+
 SERVER RESPONSE JSON
 Response Type: User Validation
 Fields: Success
 
+Response Type: Created User
+Fields: User Name, Success
+
+Response Type: Friend Requested
+Fields: Friend Name, Success
+
+#EDITED to add Action specifier along with text or lat/lon.
 Response Type: Position Update
-Fields: User Name, Lat, Lon
+Fields: User Name, Action, Lat, Lon, Text
 
 Response Type: Friend Request
 Fields: From User

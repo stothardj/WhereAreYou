@@ -5,5 +5,11 @@
                 android:key="checkbox_preference"
                 android:title="@string/title_show_hide_toggle"
                 android:summary="@string/summary_show_hide_toggle" />
-
+        <ListPreference
+                android:key="list_preference"
+                android:title="@string/title_polling"
+                android:summary="@string/summary_polling"
+                android:entries="@array/entries_polling"
+                android:entryValues="@array/entryvalues_polling"
+                android:dialogTitle="@string/summary_polling" />
 </PreferenceScreen>
