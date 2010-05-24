@@ -201,7 +201,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               text = zone[0][1]
               action = zone[0][1]
             except:
-              #BUG Here.
+              #BUG Here. Where is the actual coordinate??? That should be pushed.
               text = ""             #Empty string is fine.
               action = "SHOWGPS"    #Really, this depends on whether the user set Show or Hide in the 
                                     #Android app. Can someone check this?
