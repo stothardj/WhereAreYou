@@ -7,7 +7,7 @@
         android:id="@+id/username_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/username_prompt"/>
+        android:text="@string/desusername_prompt"/>
     <EditText
         android:id="@+id/username"
         android:layout_width="fill_parent"
@@ -17,28 +17,30 @@
         android:id="@+id/password_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/password_prompt"
+        android:text="@string/despassword_prompt"
         android:layout_below="@id/username"/>
     <EditText
         android:id="@+id/password"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
         android:layout_below="@id/password_label" android:inputType="textPassword"/>
-    <Button
-        android:id="@+id/ok"
-        android:layout_width="wrap_content"
+    <TextView
+        android:id="@+id/password_label2"
+        android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/password"
-        android:layout_alignParentRight="true"
-        android:layout_marginLeft="10dip"
-        android:text="@string/login_button" />
-        android:layout_below="@id/password_label" android:inputType="textPassword"/>
+        android:text="@string/despassword_prompt2"
+        android:layout_below="@id/password"/>
+    <EditText
+        android:id="@+id/password2"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/password_label2" android:inputType="textPassword"/>
     <Button
         android:id="@+id/create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ok"
+        android:layout_below="@id/password2"
         android:layout_alignParentRight="true"
         android:layout_marginLeft="10dip"
-        android:text="@string/create_button" />
+        android:text="@string/create_button2" />
 </RelativeLayout>
