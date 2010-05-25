@@ -35,7 +35,46 @@ public class Createaccnt extends Activity{
 	private JSONStringer JSONUser;
 	private JSONObject JSONValidate;
 
-    
+	 private boolean createUser()
+	    {
+	    	JSONUser = new JSONStringer();
+	    	try 
+	    	{
+	    		JSONUser.object();
+				JSONUser.key("User Name").value(userEd.toString());
+				JSONUser.key("Password").value(passEd.toString());
+				JSONUser.key("Account Type").value("User");
+				JSONUser.key("Request Type").value("Create User");
+				JSONUser.key("Last Name").value(Lastname.toString());
+				JSONUser.key("First Name").value(Firstname.toString());
+				JSONUser.endObject();
+				client.sendLine(JSONUser.toString());
+				String response = client.readLine();
+		        final Context context = getApplicationContext();
+				JSONValidate = new JSONObject(response);
+				String responseType = JSONValidate.getString("Response Type");
+				boolean isValidated = JSONValidate.getBoolean("Success");
+				if(responseType.equals("Created User") && isValidated == true)
+				{
+					return true;	
+				}
+				else
+				{
+					return false;
+				}	
+			} 
+	    	catch (JSONException e1) 
+			{
+	    		e1.printStackTrace();
+	    		return false;			
+			}
+	    	catch (IOException e)
+	    	{
+	    		e.printStackTrace();
+	    		return false;
+	    	}
+	    	
+	    }    
 
 	@Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,17 +83,19 @@ public class Createaccnt extends Activity{
         final EditText userName = (EditText) findViewById(R.id.username);
         final EditText password = (EditText) findViewById(R.id.password);
         final EditText password2 = (EditText) findViewById(R.id.password2);
-        final EditText Lastname = (EditText) findViewById(R.id.Lastname);
-        final EditText Firstname = (EditText) findViewById(R.id.Firstname);
+        final EditText Lastname2 = (EditText) findViewById(R.id.Lastname);
+        final EditText Firstname2 = (EditText) findViewById(R.id.Firstname);
         final Context context = getApplicationContext();
         client = new JavaClient("169.232.101.67", 79);
-      //  boolean connected = connectToServer();
+        boolean connected = connectToServer();
         Button next = (Button) findViewById(R.id.create);
         next.setOnClickListener(new View.OnClickListener(){
     	public void onClick(View view) {
            	userEd = userName.getText();
         	passEd = password.getText();
         	passEd2 = password2.getText();
+        	Lastname = Lastname2.getText();
+        	Firstname = Firstname2.getText();
         	user = userEd.toString();
         	pass = passEd.toString();
         	pass2 = passEd2.toString();
@@ -62,9 +103,17 @@ public class Createaccnt extends Activity{
         	{
         		if(pass.equals(pass2))
         		{
-        		Intent myIntent = new Intent(view.getContext(), GUI.class);
-        		startActivity(myIntent);
-        		}
+        			boolean created = createUser();
+        			if(created){
+	        		Intent myIntent = new Intent(view.getContext(), GUI.class);
+	        		startActivity(myIntent);
+        			}
+        			else{
+            			CharSequence errorText = "Unable to create account. Please try again.";
+            			Toast.makeText(context, errorText,15).show();
+            			return;
+        			}
+	        	}
         		else
         		{
         			CharSequence errorText = "Please re-enter your passwords! They were not the same.";
@@ -81,6 +130,7 @@ public class Createaccnt extends Activity{
         	}
 
     	}});
+        
 	}
 	
 	
@@ -104,45 +154,7 @@ public class Createaccnt extends Activity{
 
   //  Request Type: Create User
    // Fields: First Name, Last Name, User Name, Password, Account Type
-    private boolean createUser()
-    {
-    	JSONUser = new JSONStringer();
-    	try 
-    	{
-    		JSONUser.object();
-			JSONUser.key("User Name").value(userEd.toString());
-			JSONUser.key("Password").value(passEd.toString());
-			JSONUser.key("Account Type").value("User");
-			JSONUser.key("Request Type").value("Create User");
-			JSONUser.key("Last Name").value(Lastname.toString());
-			JSONUser.key("First Name").value(Firstname.toString());
-			JSONUser.endObject();
-			client.sendLine(JSONUser.toString());
-			String response = client.readLine();
-			JSONValidate = new JSONObject(response);
-			String responseType = JSONValidate.getString("Response Type");
-			boolean isValidated = JSONValidate.getBoolean("Success");
-			if(responseType.equals("User Validation") && isValidated == true)
-			{
-				return true;	
-			}
-			else
-			{
-				return false;
-			}	
-		} 
-    	catch (JSONException e1) 
-		{
-    		e1.printStackTrace();
-    		return false;			
-		}
-    	catch (IOException e)
-    	{
-    		e.printStackTrace();
-    		return false;
-    	}
-    	
-    }    
+   
 }
 /*e
 public void onCreate(Bundle savedInstanceState) {
