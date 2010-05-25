@@ -3,18 +3,21 @@
     <string name="app_name">GUI</string>
     <string name="mapActivity_name">Map Activity</string>
     <string name="settingActivity_name">Map Activity</string>
-    <string name="createActivity_name">Create Activity</string>
     <string name="tabs_name">Tabs</string>
 	<string name="createaccount_name">Createaccnt</string>
-	
+    <string name="createActivity_name">Create Activity</string>
+
     <string name="username_prompt">Username: </string>
     <string name="password_prompt">Password: </string>
+    <string name="first_prompt">First Name: </string>
+    <string name="last_prompt">Last Name: </string>
+    <string name="login_button">Login</string>
     <string name="desusername_prompt">Desired Username: </string>
     <string name="despassword_prompt">Desired Password: </string>
     <string name="despassword_prompt2">Desired Password (repeat): </string>
-    <string name="login_button">Login</string>
     <string name="create_button">Create Account</string>
     <string name="create_button2">Create New Account!</string>
+
     <string name="title_show_hide_toggle">Show/Hide</string>
     <string name="summary_show_hide_toggle">Click to toggle between show and hide.</string>
 <string name="title_polling">Polling Frequency</string>

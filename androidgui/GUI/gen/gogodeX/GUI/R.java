@@ -18,9 +18,13 @@ public final class R {
         public static final int icon=0x7f020000;
     }
     public static final class id {
-        public static final int create=0x7f070006;
-        public static final int mapview=0x7f070008;
-        public static final int ok=0x7f070007;
+        public static final int Firstname=0x7f070007;
+        public static final int Lastname=0x7f070009;
+        public static final int create=0x7f07000a;
+        public static final int first_label=0x7f070006;
+        public static final int last_label=0x7f070008;
+        public static final int mapview=0x7f07000c;
+        public static final int ok=0x7f07000b;
         public static final int password=0x7f070003;
         public static final int password2=0x7f070005;
         public static final int password_label=0x7f070002;
@@ -36,22 +40,24 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
-        public static final int createActivity_name=0x7f060003;
-        public static final int create_button=0x7f06000c;
-        public static final int create_button2=0x7f06000d;
-        public static final int createaccount_name=0x7f060005;
-        public static final int despassword_prompt=0x7f060009;
-        public static final int despassword_prompt2=0x7f06000a;
-        public static final int desusername_prompt=0x7f060008;
-        public static final int login_button=0x7f06000b;
+        public static final int createActivity_name=0x7f060005;
+        public static final int create_button=0x7f06000e;
+        public static final int create_button2=0x7f06000f;
+        public static final int createaccount_name=0x7f060004;
+        public static final int despassword_prompt=0x7f06000c;
+        public static final int despassword_prompt2=0x7f06000d;
+        public static final int desusername_prompt=0x7f06000b;
+        public static final int first_prompt=0x7f060008;
+        public static final int last_prompt=0x7f060009;
+        public static final int login_button=0x7f06000a;
         public static final int mapActivity_name=0x7f060001;
         public static final int password_prompt=0x7f060007;
         public static final int settingActivity_name=0x7f060002;
-        public static final int summary_polling=0x7f060011;
-        public static final int summary_show_hide_toggle=0x7f06000f;
-        public static final int tabs_name=0x7f060004;
-        public static final int title_polling=0x7f060010;
-        public static final int title_show_hide_toggle=0x7f06000e;
+        public static final int summary_polling=0x7f060013;
+        public static final int summary_show_hide_toggle=0x7f060011;
+        public static final int tabs_name=0x7f060003;
+        public static final int title_polling=0x7f060012;
+        public static final int title_show_hide_toggle=0x7f060010;
         public static final int username_prompt=0x7f060006;
     }
     public static final class xml {
