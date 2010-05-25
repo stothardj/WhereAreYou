@@ -3,7 +3,6 @@ from pgasync import ConnectionPool  #Postgres/Twisted interface.
 import json
 
 import glue
-import os
 
 '''
 GENERAL TO DOs:
@@ -27,14 +26,13 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
 
   def __init__(self):
-    server = os.getlogin()
-    if server == "jake":
-      db="mydb"
-    elif server == "ryan":
-      db="gogodex"
-      global db
-    #TO DO: Change database name, username and password. Password should be configured in a file.
-    self.pool = ConnectionPool("pgasync",dbname=db,user=server,password="stupidpassword")
+
+    with open('server.conf') as f:
+      settings = f.read()
+
+    setobj = json.loads(settings)
+
+    self.pool = ConnectionPool("pgasync",dbname=str(setobj['Database']),user=str(setobj['User']),password=str(setobj['Password']))
 
   def logout(self):
     if self.username != None:
