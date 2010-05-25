@@ -99,10 +99,14 @@ public class Createaccnt extends Activity{
         	user = userEd.toString();
         	pass = passEd.toString();
         	pass2 = passEd2.toString();
+            boolean connected = connectToServer();
         	if(user.length() != 0 && pass.length() != 0 && pass2.length() != 0)	
         	{
         		if(pass.equals(pass2))
         		{
+        			if(connected){
+        				
+        			
         			boolean created = createUser();
         			if(created){
 	        		Intent myIntent = new Intent(view.getContext(), GUI.class);
@@ -113,6 +117,13 @@ public class Createaccnt extends Activity{
             			Toast.makeText(context, errorText,15).show();
             			return;
         			}
+        			}
+        			else{
+            			CharSequence errorText = "Unable to connect to the server. Please try again.";
+            			Toast.makeText(context, errorText,15).show();
+        				
+        			}
+        			
 	        	}
         		else
         		{

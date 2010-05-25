@@ -119,7 +119,7 @@ public class GUI extends Activity {
             	}
         		
             	}
-            });   
+            });  
       }
     
     private boolean connectToServer()

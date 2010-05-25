@@ -40,25 +40,26 @@ public final class R {
     }
     public static final class string {
         public static final int app_name=0x7f060000;
-        public static final int createActivity_name=0x7f060005;
-        public static final int create_button=0x7f06000e;
-        public static final int create_button2=0x7f06000f;
-        public static final int createaccount_name=0x7f060004;
-        public static final int despassword_prompt=0x7f06000c;
-        public static final int despassword_prompt2=0x7f06000d;
-        public static final int desusername_prompt=0x7f06000b;
-        public static final int first_prompt=0x7f060008;
-        public static final int last_prompt=0x7f060009;
-        public static final int login_button=0x7f06000a;
+        public static final int createActivity_name=0x7f060006;
+        public static final int create_button=0x7f06000f;
+        public static final int create_button2=0x7f060010;
+        public static final int createaccount_name=0x7f060005;
+        public static final int despassword_prompt=0x7f06000d;
+        public static final int despassword_prompt2=0x7f06000e;
+        public static final int desusername_prompt=0x7f06000c;
+        public static final int first_prompt=0x7f060009;
+        public static final int friendslist_name=0x7f060002;
+        public static final int last_prompt=0x7f06000a;
+        public static final int login_button=0x7f06000b;
         public static final int mapActivity_name=0x7f060001;
-        public static final int password_prompt=0x7f060007;
-        public static final int settingActivity_name=0x7f060002;
-        public static final int summary_polling=0x7f060013;
-        public static final int summary_show_hide_toggle=0x7f060011;
-        public static final int tabs_name=0x7f060003;
-        public static final int title_polling=0x7f060012;
-        public static final int title_show_hide_toggle=0x7f060010;
-        public static final int username_prompt=0x7f060006;
+        public static final int password_prompt=0x7f060008;
+        public static final int settingActivity_name=0x7f060003;
+        public static final int summary_polling=0x7f060014;
+        public static final int summary_show_hide_toggle=0x7f060012;
+        public static final int tabs_name=0x7f060004;
+        public static final int title_polling=0x7f060013;
+        public static final int title_show_hide_toggle=0x7f060011;
+        public static final int username_prompt=0x7f060007;
     }
     public static final class xml {
         public static final int settings=0x7f040000;

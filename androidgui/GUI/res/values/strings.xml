@@ -2,6 +2,7 @@
 <resources>
     <string name="app_name">GUI</string>
     <string name="mapActivity_name">Map Activity</string>
+    <string name="friendslist_name">Map Actvitity</string>
     <string name="settingActivity_name">Map Activity</string>
     <string name="tabs_name">Tabs</string>
 	<string name="createaccount_name">Createaccnt</string>
