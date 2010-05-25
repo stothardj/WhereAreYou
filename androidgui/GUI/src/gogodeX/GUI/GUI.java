@@ -36,7 +36,7 @@ public class GUI extends Activity {
     private Context context;
     private int duration;
     private Intent startUpdatingCoordinates;
-    private boolean connected;
+    private static boolean connected;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -46,8 +46,9 @@ public class GUI extends Activity {
         Button creation = (Button) findViewById(R.id.create);
         creation.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View view) {
-        		Intent myIntent2 = new Intent(view.getContext(), Createaccnt.class);
-        		startActivity(myIntent2);
+        		Intent myIntent2 = new Intent(view.getContext(), Createaccnt.class); // change the 
+        		startActivity(myIntent2);						// Createaccnt.class to Tabs.class if you
+        														// want to test the stuff in the tabs w/o a server
 
         	}
         	
@@ -61,12 +62,7 @@ public class GUI extends Activity {
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
         client = new JavaClient("169.232.101.67", 79);
-        connected = connectToServer();
-        if(connected == false)
-        {
-        	CharSequence text = "Unable to Connect to the Server! Connection will occur upon logging in.";
-        	Toast.makeText(context, text, duration).show();
-        }
+        //connected = connectToServer();
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
@@ -185,6 +181,16 @@ public class GUI extends Activity {
     public static void getLM(LocationManager LM)
     {
     	LM = GUI.LM;
+    }
+    
+    public static boolean getConnected()
+    {
+    	return connected;
+    }
+    
+    public static void setConnected(boolean connect)
+    {
+    	connected = connect;
     }
     
 

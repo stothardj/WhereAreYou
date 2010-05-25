@@ -86,8 +86,7 @@ public class Createaccnt extends Activity{
         final EditText Lastname2 = (EditText) findViewById(R.id.Lastname);
         final EditText Firstname2 = (EditText) findViewById(R.id.Firstname);
         final Context context = getApplicationContext();
-        client = new JavaClient("169.232.101.67", 79);
-        boolean connected = connectToServer();
+        client = GUI.getClient();
         Button next = (Button) findViewById(R.id.create);
         next.setOnClickListener(new View.OnClickListener(){
     	public void onClick(View view) {
@@ -99,14 +98,16 @@ public class Createaccnt extends Activity{
         	user = userEd.toString();
         	pass = passEd.toString();
         	pass2 = passEd2.toString();
-            boolean connected = connectToServer();
         	if(user.length() != 0 && pass.length() != 0 && pass2.length() != 0)	
         	{
         		if(pass.equals(pass2))
         		{
-        			if(connected){
-        				
+        			if(!GUI.getConnected())
+        			{
+        				GUI.setConnected(connectToServer());
+        			}
         			
+        			if(GUI.getConnected()){
         			boolean created = createUser();
         			if(created){
 	        		Intent myIntent = new Intent(view.getContext(), GUI.class);
@@ -142,7 +143,15 @@ public class Createaccnt extends Activity{
 
     	}});
         
-	}
+        Button back = (Button) findViewById(R.id.Back);
+        back.setOnClickListener(new View.OnClickListener()
+        {
+        	public void onClick(View view)
+        	{
+        		Intent myIntent = new Intent(view.getContext(), GUI.class);
+        		startActivity(myIntent);
+        	}});
+		}
 	
 	
     private boolean connectToServer()
