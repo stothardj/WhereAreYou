@@ -36,8 +36,8 @@
         android:id="@+id/create"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@id/ok"
-        android:layout_alignParentRight="true"
+        android:layout_below="@id/password"
+        android:layout_alignParentLeft="true"
         android:layout_marginLeft="10dip"
         android:text="@string/create_button" />
 </RelativeLayout>
