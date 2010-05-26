@@ -36,13 +36,24 @@ public class GUI extends Activity {
     private Context context;
     private int duration;
     private Intent startUpdatingCoordinates;
-    private boolean connected;
+    private static boolean connected;
+    private boolean validated;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.login);
         Button next = (Button) findViewById(R.id.ok);
+        Button creation = (Button) findViewById(R.id.create);
+        
+        creation.setOnClickListener(new View.OnClickListener(){
+        	public void onClick(View view) {
+        		Intent myIntent2 = new Intent(view.getContext(), Createaccnt.class); // change the 
+        		startActivity(myIntent2);						// Createaccnt.class to Tabs.class if you
+        														// want to test the stuff in the tabs w/o a server
+        	}
+        });
+        
         connected = false;
         userName = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
@@ -50,66 +61,63 @@ public class GUI extends Activity {
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("169.232.101.67", 79);
-        connected = connectToServer();
-        if(connected == false)
-        {
-        	CharSequence text = "Unable to Connect to the Server! Connection will occur upon logging in.";
-        	Toast.makeText(context, text, duration).show();
-        }
+        client = new JavaClient("149.142.228.226", 79);
+        //connected = connectToServer();
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	if(connected != false)
-            	{
 	            	userEd = userName.getText();
 	            	passEd = password.getText();
 	            	user = userEd.toString();
 	            	pass = passEd.toString();
-	            	if(user.length() != 0 && pass.length() != 0)	
-	            	{
-	            		boolean validated = validateUser();
-	            		if(validated == false)
-	            		{
-	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
-	            			Toast.makeText(context, text, duration).show();
-	            			return;	
-	            		}
-	            		
-	            	    startService(startUpdatingCoordinates);
-	            	    
-	            		Intent myIntent = new Intent(view.getContext(), Tabs.class);
-	            		startActivity(myIntent);
-	            	}
-	            	else
+	            	if(user.length() == 0 || pass.length() == 0)	
 	            	{
 	            		CharSequence text = "Please Input a User Name and Password!";
 	            		Toast.makeText(context, text, duration).show();	
 	            		return;	
 	            	}
-            	}
-            	else
-            	{
-	            	userEd = userName.getText();
-	            	passEd = password.getText();
-	            	user = userEd.toString();
-	            	pass = passEd.toString();
-	            	if(user.length() != 0 && pass.length() != 0)	
-	            	{
+	            	else if(connected == false)
+	            	{ 
 	            		connected = connectToServer();
-	            		CharSequence text = "Unable to Connect to the Server!";
-	            		Toast.makeText(context, text, duration).show();
-	            		return;
+	            		if(connected == true)
+	            		{
+	            			validated = validateUser();
+	            			if(validated == false)
+		            		{
+		            			CharSequence text = "Sorry, User Name and/or Password not Found!";
+		            			Toast.makeText(context, text, duration).show();
+		            			return;	
+		            		}
+	            		
+	            			startService(startUpdatingCoordinates);
+	            	    
+	            			Intent myIntent = new Intent(view.getContext(), Tabs.class);
+	            			startActivity(myIntent);
+	            		}
+	            		else
+	            		{
+		            		CharSequence text = "Unable to Connect to the Server!";
+		            		Toast.makeText(context, text, duration).show(); 
+		            		return;
+	            		}
 	            	}
 	            	else
 	            	{
-	            		CharSequence text = "Please Input a User Name and Password!";
-	            		Toast.makeText(context, text, duration).show();
+            			validated = validateUser();
+            			if(validated == false)
+	            		{
+	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
+	            			Toast.makeText(context, text, duration).show();
+	            			return;	
+	            		}
+            		
+            			startService(startUpdatingCoordinates);
+            	    
+            			Intent myIntent = new Intent(view.getContext(), Tabs.class);
+            			startActivity(myIntent);
 	            	}
             	}
-        		
-            	}
-            });    
+            });  
       }
     
     private boolean connectToServer()
@@ -166,7 +174,6 @@ public class GUI extends Activity {
     	}
     	
     }
-    
     public static JavaClient getClient()
     {
     	return client;
@@ -177,5 +184,14 @@ public class GUI extends Activity {
     	LM = GUI.LM;
     }
     
+    public static boolean getConnected()
+    {
+    	return connected;
+    }
+    
+    public static void setConnected(boolean connect)
+    {
+    	connected = connect;
+    }
 
 }

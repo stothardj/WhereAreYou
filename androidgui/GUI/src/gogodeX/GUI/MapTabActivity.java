@@ -12,7 +12,7 @@ public class MapTabActivity extends MapActivity {
 	private static List<Overlay> mapOverlays;
 	private MapView mapView;
 	//private Location L;
-	
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
@@ -21,7 +21,7 @@ public class MapTabActivity extends MapActivity {
 	    mapView.setBuiltInZoomControls(true);
 	    mapOverlays = mapView.getOverlays();
 	    Drawable drawable = this.getResources().getDrawable(R.drawable.icon);
-	    
+
 	    /*
 	    L = GPSUpdater.getLocation();
 	    Double lat = L.getLatitude();
@@ -34,11 +34,11 @@ public class MapTabActivity extends MapActivity {
 	    myOverlay.addOverlay(myOverlayItem);
 	    mapOverlays.add(myOverlay);
 		*/
-	    
+
 	    displayCoordinate(19240000,-99120000,drawable,"","");
 	    initMyLocation();
 	}
-	
+
 	public void displayCoordinate(int lat, int lon, Drawable drawable, String title, String snippet)
 	{
 		BuddyOverlay itemizedoverlay = new BuddyOverlay(drawable);
@@ -46,7 +46,7 @@ public class MapTabActivity extends MapActivity {
 		itemizedoverlay.addOverlay(new OverlayItem(point, title, snippet));
 		mapOverlays.add(itemizedoverlay);
 	}
-	
+
 	// Function no longer used
 	public static void onLocationChange(Location L)
 	{
@@ -62,9 +62,9 @@ public class MapTabActivity extends MapActivity {
 	    OverlayItem myOverlayItem = new OverlayItem(myPoint, "", "");
 	    myOverlay.addOverlay(myOverlayItem);
 	    mapOverlays.add(myOverlay);*/
-		
+
 	}
-	
+
 	// Sets up the self marker on the map
 	// marker is updated automatically
 	private void initMyLocation()
@@ -73,7 +73,7 @@ public class MapTabActivity extends MapActivity {
 		myLocOverlay.enableMyLocation();
 		mapView.getOverlays().add(myLocOverlay);
 	}
-	
+
     @Override
     protected boolean isRouteDisplayed() {
         return false;
