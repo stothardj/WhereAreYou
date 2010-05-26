@@ -14,7 +14,7 @@ public class MessageHandler extends Thread {
 	public MessageHandler(JavaClient client, GPSUpdater currentGPS)
 	{
 		JSONString = "";
-		twistedClient = client;
+		twistedClient = GUI.getClient();
 		GPS = currentGPS;
 	}
 	

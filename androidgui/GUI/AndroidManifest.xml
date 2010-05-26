@@ -13,6 +13,18 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
+        <activity android:name="Createaccnt" android:label="@string/createActivity_name">
+	       <intent-filter>
+	          <category android:name="android.intent.category.EMBED"></category>
+	          <action android:name="android.intent.action.MAIN"></action>
+	       </intent-filter>
+    	</activity>
+    	<activity android:name="FriendsList" android:label="@string/friendslist_name">
+			<intent-filter>
+	          <category android:name="android.intent.category.EMBED"></category>
+	          <action android:name="android.intent.action.MAIN"></action>
+			</intent-filter>
+    	</activity>
     	<activity android:name="MapTabActivity" android:label="@string/mapActivity_name">
 			<intent-filter>
 	          <category android:name="android.intent.category.EMBED"></category>

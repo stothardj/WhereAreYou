@@ -36,6 +36,7 @@ public class GPSUpdater extends Service {
 	private static double longitude;
 	//Handler for handling incoming server messages
 	private MessageHandler serverUpdates;
+	private static String mocLocationProvider;
 	
 	@Override
 	public void onCreate()
@@ -52,14 +53,13 @@ public class GPSUpdater extends Service {
 	private void GPSHandler()
 	{
 		//Obtain the constant string value for the GPS provider
-	    String mocLocationProvider = LocationManager.GPS_PROVIDER;
+	    mocLocationProvider = LocationManager.GPS_PROVIDER;
 	    //Create a new mocLocationListener instance to handle coordinate updates
 	    LocationListener mocLocation = new mocLocationListener(); 
 	    //Initiate the updating of coordinates through the requestLocationUpdates method
 	    LM.requestLocationUpdates(mocLocationProvider, 0, 0, mocLocation);
 	    //Get the last known location of the device for the user's starting location
-	    location = LM.getLastKnownLocation(mocLocationProvider);
-	    
+	    location = LM.getLastKnownLocation(mocLocationProvider);    
 		serverUpdates = new MessageHandler(client, this);
 	    t = new Thread(serverUpdates);
 	    t.start();
@@ -71,6 +71,7 @@ public class GPSUpdater extends Service {
 	            public void onLocationChanged(Location L) { 
 	            	//Set the user's location to the newly received location
 	            	location = L;
+	            	MapTabActivity.onLocationChange(L);
 	            	//Create a new JSONStringer to create a JSON string to send to the server
 	            	coordinates = new JSONStringer();
 	            		//As long as the new location was received
@@ -128,6 +129,7 @@ public class GPSUpdater extends Service {
 		}
 		else
 		{
+			location = new Location(mocLocationProvider);
 			location.setLatitude(0.0);
 			location.setLongitude(0.0);
 			return location;
