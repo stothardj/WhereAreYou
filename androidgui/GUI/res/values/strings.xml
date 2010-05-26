@@ -10,8 +10,8 @@
 
     <string name="username_prompt">Username: </string>
     <string name="password_prompt">Password: </string>
-    <string name="first_prompt">First Name: </string>
-    <string name="last_prompt">Last Name: </string>
+    <string name="first_prompt">First Name (optional):</string>
+    <string name="last_prompt">Last Name (optional):</string>
     <string name="login_button">Login</string>
     <string name="desusername_prompt">Desired Username: </string>
     <string name="despassword_prompt">Desired Password: </string>
