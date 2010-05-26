@@ -37,6 +37,7 @@ public class GUI extends Activity {
     private int duration;
     private Intent startUpdatingCoordinates;
     private static boolean connected;
+    private boolean validated;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -44,16 +45,15 @@ public class GUI extends Activity {
         setContentView(R.layout.login);
         Button next = (Button) findViewById(R.id.ok);
         Button creation = (Button) findViewById(R.id.create);
+        
         creation.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View view) {
         		Intent myIntent2 = new Intent(view.getContext(), Createaccnt.class); // change the 
         		startActivity(myIntent2);						// Createaccnt.class to Tabs.class if you
         														// want to test the stuff in the tabs w/o a server
-
         	}
-        	
-        	
         });
+        
         connected = false;
         userName = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
@@ -66,54 +66,56 @@ public class GUI extends Activity {
         
         next.setOnClickListener(new View.OnClickListener() {
             public void onClick(View view) {
-            	if(connected != false)
-            	{
 	            	userEd = userName.getText();
 	            	passEd = password.getText();
 	            	user = userEd.toString();
 	            	pass = passEd.toString();
-	            	if(user.length() != 0 && pass.length() != 0)	
-	            	{
-	            		boolean validated = validateUser();
-	            		if(validated == false)
-	            		{
-	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
-	            			Toast.makeText(context, text, duration).show();
-	            			return;	
-	            		}
-	            		
-	            	    startService(startUpdatingCoordinates);
-	            	    
-	            		Intent myIntent = new Intent(view.getContext(), Tabs.class);
-	            		startActivity(myIntent);
-	            	}
-	            	else
+	            	if(user.length() == 0 || pass.length() == 0)	
 	            	{
 	            		CharSequence text = "Please Input a User Name and Password!";
 	            		Toast.makeText(context, text, duration).show();	
 	            		return;	
 	            	}
-            	}
-            	else
-            	{
-	            	userEd = userName.getText();
-	            	passEd = password.getText();
-	            	user = userEd.toString();
-	            	pass = passEd.toString();
-	            	if(user.length() != 0 && pass.length() != 0)	
-	            	{
+	            	else if(connected == false)
+	            	{ 
 	            		connected = connectToServer();
-	            		CharSequence text = "Unable to Connect to the Server!";
-	            		Toast.makeText(context, text, duration).show();
-	            		return;
+	            		if(connected == true)
+	            		{
+	            			validated = validateUser();
+	            			if(validated == false)
+		            		{
+		            			CharSequence text = "Sorry, User Name and/or Password not Found!";
+		            			Toast.makeText(context, text, duration).show();
+		            			return;	
+		            		}
+	            		
+	            			startService(startUpdatingCoordinates);
+	            	    
+	            			Intent myIntent = new Intent(view.getContext(), Tabs.class);
+	            			startActivity(myIntent);
+	            		}
+	            		else
+	            		{
+		            		CharSequence text = "Unable to Connect to the Server!";
+		            		Toast.makeText(context, text, duration).show(); 
+		            		return;
+	            		}
 	            	}
 	            	else
 	            	{
-	            		CharSequence text = "Please Input a User Name and Password!";
-	            		Toast.makeText(context, text, duration).show();
+            			validated = validateUser();
+            			if(validated == false)
+	            		{
+	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
+	            			Toast.makeText(context, text, duration).show();
+	            			return;	
+	            		}
+            		
+            			startService(startUpdatingCoordinates);
+            	    
+            			Intent myIntent = new Intent(view.getContext(), Tabs.class);
+            			startActivity(myIntent);
 	            	}
-            	}
-        		
             	}
             });  
       }
