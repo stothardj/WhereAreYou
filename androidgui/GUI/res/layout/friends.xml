@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="utf-8"?>
+<AbsoluteLayout
+android:id="@+id/widget0"
+android:layout_width="fill_parent"
+android:layout_height="fill_parent"
+xmlns:android="http://schemas.android.com/apk/res/android"
+>
+<Button
+android:id="@+id/widget28"
+android:layout_width="75px"
+android:layout_height="50px"
+android:text="Button"
+android:layout_x="230px"
+android:layout_y="35px"
+>
+</Button>
+<LinearLayout
+android:id="@+id/widget29"
+android:layout_width="200px"
+android:layout_height="320px"
+android:orientation="vertical"
+android:layout_x="25px"
+android:layout_y="100px"
+>
+	<ListView
+    android:id="@android:id/list"
+    android:layout_width="fill_parent"
+    android:layout_height="fill_parent"
+    />
+</LinearLayout>
+<Button
+android:id="@+id/friend_remove"
+android:layout_width="75px"
+android:layout_height="50px"
+android:text="Button"
+android:layout_x="230px"
+android:layout_y="100px"
+>
+</Button>
+<EditText
+android:id="@+id/widget31"
+android:layout_width="200px"
+android:layout_height="50px"
+android:text="EditText"
+android:textSize="18sp"
+android:layout_x="25px"
+android:layout_y="35px"
+>
+</EditText>
+</AbsoluteLayout>
