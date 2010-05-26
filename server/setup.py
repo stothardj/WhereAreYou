@@ -38,94 +38,54 @@ pool = ConnectionPool("pgasync",dbname=str(setobj['Database']),user=str(setobj['
 
 class StupidProtcol(protocol.ProcessProtocol):
 
-  def endProcess(self):
+  def endProcess(self, ignore):
     print "Ending the process"
     try:
       reactor.stop()
     except:
-      print "Reactor claims to be done."
+      print "Cannot stop reactor. Just Ctrl+C it."
 
   def __init__(self):
 
-    #pgasync's transactions are fickle.
-    def writeResponse(message):
-      print message
+    connection = pool.connect()
+    cursor = connection.cursor()
 
-    def dropTables():
-      d = defer.Deferred()
-      def _dropTa(ignore):
-        print "Removing any old tables"
-        pool.runOperation("DROP TABLE IF EXISTS users")
-        pool.runOperation("DROP TABLE IF EXISTS zonenames")
-        pool.runOperation("DROP TABLE IF EXISTS friends")
-      d.addCallback(_dropTa)
-      d.addErrback(writeResponse)
-      return d
+    cursor.execute("ALTER DATABASE "+setobj['Database']+" SET client_min_messages TO WARNING")
 
-    def dropTypes():
-      d = defer.Deferred()
-      def _dropTy(ignore):
-        print "Removing any old types"
-        pool.runOperation("DROP TYPE IF EXISTS friend_status")
-        pool.runOperation("DROP TYPE IF EXISTS account_type")
-        pool.runOperation("DROP TYPE IF EXISTS zone_action")
-      d.addCallback(_dropTy)
-      d.addErrback(writeResponse)
-      return d
+    cursor.execute("DROP TABLE IF EXISTS users")
+    cursor.execute("DROP TABLE IF EXISTS zonenames")
+    cursor.execute("DROP TABLE IF EXISTS friends")
 
-    def createTypes():
-      d = defer.Deferred()
-      def _createType(ignore):
-        print "Creating types"
-        pool.runOperation("CREATE TYPE friend_status AS ENUM ('Accepted', 'Unaccepted', 'Pending')")
-        pool.runOperation("CREATE TYPE account_type AS ENUM ('User')")
-        pool.runOperation("CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE')")
-      d.addCallback(_createType)
-      d.addErrback(writeResponse)
-      return d
+    cursor.execute("DROP TYPE IF EXISTS friend_status")
+    cursor.execute("DROP TYPE IF EXISTS account_type")
+    cursor.execute("DROP TYPE IF EXISTS zone_action")
 
-    def createTables():
-      d = defer.Deferred()
-      def _createTable(ignore):
-        print "Creating tables"
-
-        ### BUG ### Could not get setup script to work with primary key
-        pool.runOperation("CREATE TABLE friends (\
-        username  varchar(50) PRIMARY KEY,\
-        friendname  varchar(50) NOT NULL,\
-        status    friend_status NOT NULL\
-        )")
-        pool.runOperation("CREATE TABLE users (\
-        firstname  varchar(50),\
-        lastname  varchar(50),\
-        UserName  varchar(50) PRIMARY KEY,\
-        Password  varchar(50),\
-        accounttype  account_type,\
-        lastloc    point\
-        )")
-        pool.runOperation("CREATE TABLE zonenames (\
-        UserName  varchar(50) NOT NULL,\
-        ZoneName  varchar(255) NOT NULL,\
-        zone    circle NOT NULL,\
-        action      zone_action NOT NULL,\
-        text        varchar(255)\
-        )")
-      d.addCallback(_createTable)
-      d.addErrback(writeResponse)
-      return d
-
-    d0 = dropTables()
-    d1 = dropTypes()
-    d2 = createTypes()
-    d3 = createTables()
-
-    #Lazy scheduling
-    d0.callback("One")
-    reactor.callLater(2, d1.callback, "Two")
-    reactor.callLater(4, d2.callback, "Three")
-    reactor.callLater(6, d3.callback, "Four")
-
-    reactor.callLater(10, self.endProcess)
+    cursor.execute("CREATE TYPE friend_status AS ENUM ('Accepted', 'Unaccepted', 'Pending')")
+    cursor.execute("CREATE TYPE account_type AS ENUM ('User')")
+    cursor.execute("CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE')")
+    cursor.execute("CREATE TABLE friends (\
+    username  varchar(50),\
+    friendname  varchar(50) NOT NULL,\
+    status    friend_status NOT NULL\
+    )")
+    cursor.execute("CREATE TABLE users (\
+    firstname  varchar(50),\
+    lastname  varchar(50),\
+    UserName  varchar(50),\
+    Password  varchar(50),\
+    accounttype  account_type,\
+    lastloc    point\
+    )")
+    cursor.execute("CREATE TABLE zonenames (\
+    UserName  varchar(50) NOT NULL,\
+    ZoneName  varchar(255) NOT NULL,\
+    zone    circle NOT NULL,\
+    action      zone_action NOT NULL,\
+    text        varchar(255)\
+    )")
+    cursor.execute("SELECT UserName FROM users LIMIT 1").addCallback(self.endProcess)
+    connection.commit()
+    cursor.release()
 
 
 myProcess = StupidProtcol()
