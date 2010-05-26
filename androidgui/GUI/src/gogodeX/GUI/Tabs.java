@@ -30,6 +30,11 @@ public class Tabs extends TabActivity {
         spec = tabHost.newTabSpec("setting").setIndicator("setting")
                       .setContent(intent);
         tabHost.addTab(spec);
+        
+        intent = new Intent().setClass(this.getApplicationContext(), FriendsTabActivity.class);
+        spec = tabHost.newTabSpec("friends_tab").setIndicator("friends_tab")
+                      .setContent(intent);
+        tabHost.addTab(spec);
     }
     
 }
