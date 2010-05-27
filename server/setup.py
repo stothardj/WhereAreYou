@@ -38,7 +38,7 @@ pool = ConnectionPool("pgasync",dbname=str(setobj['Database']),user=str(setobj['
 
 class StupidProtcol(protocol.ProcessProtocol):
 
-  def endProcess(self, ignore):
+  def endProcess(self):
     print "Ending the process"
     try:
       reactor.stop()
@@ -59,7 +59,6 @@ class StupidProtcol(protocol.ProcessProtocol):
     cursor.execute("DROP TYPE IF EXISTS friend_status")
     cursor.execute("DROP TYPE IF EXISTS account_type")
     cursor.execute("DROP TYPE IF EXISTS zone_action")
-
     cursor.execute("CREATE TYPE friend_status AS ENUM ('Accepted', 'Unaccepted', 'Pending')")
     cursor.execute("CREATE TYPE account_type AS ENUM ('User')")
     cursor.execute("CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE')")
@@ -83,9 +82,11 @@ class StupidProtcol(protocol.ProcessProtocol):
     action      zone_action NOT NULL,\
     text        varchar(255)\
     )")
-    cursor.execute("SELECT UserName FROM users LIMIT 1").addCallback(self.endProcess)
     connection.commit()
     cursor.release()
+    #Ugly way to probably avoid data race
+    print "Wait 3 seconds."
+    reactor.callLater(3, self.endProcess)
 
 
 myProcess = StupidProtcol()
