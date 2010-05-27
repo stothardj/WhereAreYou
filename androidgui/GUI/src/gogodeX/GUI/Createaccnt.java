@@ -68,11 +68,6 @@ public class Createaccnt extends Activity{
 	    		e1.printStackTrace();
 	    		return false;			
 			}
-	    	catch (IOException e)
-	    	{
-	    		e.printStackTrace();
-	    		return false;
-	    	}
 	    	
 	    }    
 

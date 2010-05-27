@@ -6,7 +6,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class MessageHandler extends Thread {
-	private JavaClient twistedClient;
+	private static JavaClient twistedClient;
 	private String JSONString;
 	private GPSUpdater GPS;
 	private JSONObject tokenJSON;
@@ -25,15 +25,11 @@ public class MessageHandler extends Thread {
 	
 	public void waitForMessage()
 	{
-		try 
+		while(JSONString.equals(""))
 		{
 			JSONString = twistedClient.readLine();
-		} 
-		catch (IOException e) 
-		{
-			// TODO Auto-generated catch block
-			e.printStackTrace();
 		}
+ 
 		parseJSON(JSONString);
 	}
 	
@@ -52,7 +48,7 @@ public class MessageHandler extends Thread {
 		
 		try 
 		{
-			if (tokenJSON.get("Request Type") == "Coordinate Update")
+			if (tokenJSON.get("Request Type").equals("Coordinate Update"))
 			{
 				double latitude = tokenJSON.getDouble("Lat");
 				double longitude = tokenJSON.getDouble("Lon");

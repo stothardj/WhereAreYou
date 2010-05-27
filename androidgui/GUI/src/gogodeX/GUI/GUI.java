@@ -61,7 +61,7 @@ public class GUI extends Activity {
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("169.232.239.24", 79);
+        client = new JavaClient("169.232.93.156", 79);
         //connected = connectToServer();
         
         next.setOnClickListener(new View.OnClickListener() {
@@ -167,11 +167,6 @@ public class GUI extends Activity {
     		e1.printStackTrace();
     		return false;			
 		}
-    	catch (IOException e)
-    	{
-    		e.printStackTrace();
-    		return false;
-    	}
     	
     }
     public static JavaClient getClient()

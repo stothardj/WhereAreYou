@@ -7,15 +7,19 @@ import android.widget.TabHost;
 
 public class Tabs extends TabActivity {
     /** Called when the activity is first created. */
+	private TabHost tabHost;
+	private TabHost.TabSpec spec;
+	private Intent intent;
+	
+	
+	
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.main);
-       setDefaultTab(0);
+        setDefaultTab(0);
         
-        TabHost tabHost = getTabHost();	// The activity TabHost
-        TabHost.TabSpec spec;  			// Resusable TabSpec for each tab
-        Intent intent;					// Reusable Intent for each tab
+        tabHost = getTabHost();	// The activity TabHost
 
         // Create an Intent to launch an Activity for the tab
         intent = new Intent().setClass(this.getApplicationContext(), MapTabActivity.class);
