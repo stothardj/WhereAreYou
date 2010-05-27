@@ -11,7 +11,7 @@ import com.google.android.maps.OverlayItem;
 public class BuddyOverlay extends ItemizedOverlay {
 	Context mContext;
 	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
-	
+
 	public BuddyOverlay(Drawable defaultMarker) {
 		  super(boundCenterBottom(defaultMarker));
 	}

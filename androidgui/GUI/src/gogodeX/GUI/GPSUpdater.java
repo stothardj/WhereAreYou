@@ -71,7 +71,7 @@ public class GPSUpdater extends Service {
 	            public void onLocationChanged(Location L) { 
 	            	//Set the user's location to the newly received location
 	            	location = L;
-	            	MapTabActivity.onLocationChange(L);
+	            	//MapTabActivity.onLocationChange(L);
 	            	//Create a new JSONStringer to create a JSON string to send to the server
 	            	coordinates = new JSONStringer();
 	            		//As long as the new location was received
