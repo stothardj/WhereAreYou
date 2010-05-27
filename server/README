@@ -3,8 +3,12 @@ interfacing with this server.
 
 INSTALL
 Install Twisted 10.0.0, Python 2.6.5 (This will not work with Python 3),
-pgasync, and postgreSQL. Setup postgres user, database, and tables appropriatly.
-Change hardcoded details for configuration.
+pgasync, and postgreSQL. Setup postgres user and database.
+
+Run
+ALTER DATABASE <databasename> SET client_min_messages TO WARNING;
+Then run python setup.py
+
 
 POSTGRES DATABASE SCHEMA
 
@@ -42,19 +46,6 @@ CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE');
 ALTER TABLE zonenames ADD COLUMN action zone_action not null;
 ALTER TABLE zonenames ADD COLUMN text varchar(255) not null;
 	
-HARDCODED CONFIGURATION
-
-The file gogodex.tac has the location of the backend module hardcoded in.
-This is necessary because you do not run this using the python command but
-using the twistd command, which is located somewhere else. Change this file
-location appropriatly.
-
-The top __init__ function in backend.py specifies the database name, username,
-and user password for the postgres. Change that appropriatly.
-
-Optional: If you want to change the port this runs on, change it in gogodex.tac
-Default is port 79, for no reason.
-
 JSON API
 Note: Case sensitive
 
