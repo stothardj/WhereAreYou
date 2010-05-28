@@ -2,6 +2,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.UnknownHostException;
+import java.util.Random;
 
 public class ClientRunner implements Runnable {
 	/*
@@ -25,7 +26,7 @@ public class ClientRunner implements Runnable {
 		}
 	}
 	
-	public void runTests(int delay) {
+	public void pushTest(int delay) {
 		AndroidUser jake = new AndroidUser("stothard");
 		AndroidUser brian = new AndroidUser("bagrm");
 		AndroidUser alex = new AndroidUser("fork");
@@ -69,6 +70,47 @@ public class ClientRunner implements Runnable {
 		jake.disconnect();
 		alex.disconnect();
 		brian.disconnect();
+	}
+	
+	public void stressTest(int delay, int numPeople, int numPosUpdates) {
+		AndroidUser[] as = new AndroidUser[numPeople];
+		AndroidUser temp = new AndroidUser("temp");
+		temp.emptyAll();
+		temp.disconnect();
+		ClientRunner.pause(delay);
+		for(int i=0; i<as.length ; i++) {
+			as[i] = new AndroidUser(Integer.toString(i));
+			as[i].createUser("f", "l", "***", "User");
+		}
+		ClientRunner.pause(delay);
+		for(int i=0; i<as.length ; i++) {
+			as[i].login("***");
+		}
+		ClientRunner.pause(delay);
+		for(int i=0; i<as.length ; i++) {
+			for(int i2 = i + 1; i2<as.length; ++i2) {
+				as[i].addFriend(Integer.toString(i2));
+			}
+		}
+		ClientRunner.pause(delay);
+		for(int i=0; i<as.length ; i++) {
+			for(int i2 = 0; i2 < i; ++i2) {
+				as[i].acceptFriend(Integer.toString(i2));
+			}
+		}
+		ClientRunner.pause(delay);
+		Random r = new Random();
+		for(int a=0; a<numPosUpdates; a++) {
+			as[r.nextInt(numPeople)].updateCoordinate(Double.toString(r.nextInt()+r.nextDouble()), Double.toString(r.nextInt()+r.nextDouble()));
+		}
+		ClientRunner.pause(delay);
+		ClientRunner.pause(delay);
+		for(AndroidUser a : as) 
+			a.disconnect();
+	}
+	
+	public void runTests(int delay) {
+		this.stressTest(delay, 50, 200);
 	}
 	
 	public void interactiveMode() {
