@@ -8,30 +8,12 @@ public class User {
 	private String firstName;
 	private String lastName;
 	private String userName;
-	private OverlayItem overlay;
+	private Location userLocation;
 	
-	public User(String fName, String lName, String uName, OverlayItem o)
+	public User(String uName, Location l)
 	{
-		setFirstName(fName);
-		setLastName(lName);
 		setUserName(uName);
-		setOverlay(o);
-	}
-
-	public void setFirstName(String firstName) {
-		this.firstName = firstName;
-	}
-
-	public String getFirstName() {
-		return firstName;
-	}
-
-	public void setLastName(String lastName) {
-		this.lastName = lastName;
-	}
-
-	public String getLastName() {
-		return lastName;
+		userLocation = l;
 	}
 
 	public void setUserName(String userName) {
@@ -42,17 +24,24 @@ public class User {
 		return userName;
 	}	
 	
+	public Location getLocation()
+	{
+		return userLocation;
+	}
+	
 	public GeoPoint getGeoPoint()
 	{
-		return overlay.getPoint();
+		Double lat = userLocation.getLatitude();
+		Double lon = userLocation.getLongitude();
+		lat = lat * 1000000;
+		lon = lon * 1000000;
+		return new GeoPoint(lat.intValue(), lon.intValue());
 	}
-
-	public void setOverlay(OverlayItem overlay) {
-		this.overlay = overlay;
-	}
-
-	public OverlayItem getOverlay() {
-		return overlay;
+	
+	public void setLocation(Location l)
+	{
+		userLocation = l;
 	}
 
 }
+

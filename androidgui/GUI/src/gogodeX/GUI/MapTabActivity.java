@@ -1,5 +1,6 @@
 package gogodeX.GUI;
 
+import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
@@ -10,19 +11,16 @@ import com.google.android.maps.*;
 
 public class MapTabActivity extends MapActivity {
     /** Called when the activity is first created. */
-	private MapView mapView;
-	MyLocationOverlay myLocOverlay;
-	BuddyOverlay friendOverlay;
-	Drawable drawable;
-	//private Location L;
+	private static MapView mapView;
+	private static Drawable icon;
+	private static MyLocationOverlay myLocOverlay;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.maptabactivityview);
 	    
-	    // Retrieve icon
-	    drawable = this.getResources().getDrawable(R.drawable.icon);	
+	    icon = getResources().getDrawable(R.drawable.icon);
 	    
 	    // Get the current MapView
 	    mapView = (MapView) findViewById(R.id.mapview);
@@ -31,55 +29,52 @@ public class MapTabActivity extends MapActivity {
 	    mapView.setBuiltInZoomControls(true);
 	    
 	    // Enable my location icon
-		//myLocOverlay = new MyLocationOverlay(this, mapView);
-		//myLocOverlay.enableMyLocation();
-		//mapView.getOverlays().add(myLocOverlay);
+		myLocOverlay = new MyLocationOverlay(this, mapView);
+		myLocOverlay.enableMyLocation();
+		mapView.getOverlays().add(myLocOverlay);
 		
-		// Enable friend overlay
-		//friendOverlay = new BuddyOverlay(drawable);
-		//mapView.getOverlays().add(friendOverlay);
-		
-		Location l = new Location("test");
-		l.setLatitude(0.0);
-		l.setLongitude(0.0);
-		this.createAndShowItemizedOverlay(l);
-		
-		l.setLatitude(37.422006);
-		l.setLongitude(-122.084095);
-		
-		
-		this.createAndShowItemizedOverlay(l);
-		
-		// Display a marker at mexico city
-	    //addFriend(19240000,-99120000,drawable,"","");
+		createAndShowItemizedOverlay();
+
 	}
 	
-	protected void createAndShowItemizedOverlay(Location newLocation) {
+	protected static void createAndShowItemizedOverlay() 
+	{
 		List overlays = mapView.getOverlays();
  
 		// first remove old overlay
-		if (overlays.size() > 0) {
-			for (Iterator iterator = overlays.iterator(); iterator.hasNext();) {
-				iterator.next();
-				iterator.remove();
+		if (overlays.size() > 0) 
+		{
+			for (Iterator iterator = overlays.iterator(); iterator.hasNext();) 
+			{
+				if(iterator.next() != myLocOverlay)
+				{
+					iterator.remove();
+				}
 			}
 		}
  
-		// transform the location to a geopoint
-		GeoPoint geopoint = new GeoPoint(
-				(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
-						.getLongitude() * 1E6));
- 
-		// initialize icon
-		Drawable icon = getResources().getDrawable(R.drawable.icon);
-		icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon
-				.getIntrinsicHeight());
- 
-		// create my overlay and show it
-		BuddyOverlay overlay = new BuddyOverlay(icon);
-		OverlayItem item = new OverlayItem(geopoint, "My Location", null);
-		overlay.addItem(item);
+		Collection<User> userCollection = MessageHandler.getFriendsList().values();
+		GeoPoint geopoint = new GeoPoint(0,0);
+		icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
+		Location newLocation;
+		BuddyOverlay overlay;
+		overlay = new BuddyOverlay(icon);
+		OverlayItem item;
+		
+		for(Iterator<User> userIterator = userCollection.iterator(); userIterator.hasNext();)
+		{
+			// transform the location to a geopoint
+			newLocation = new Location(userIterator.next().getLocation());
+			geopoint = new GeoPoint(
+					(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
+							.getLongitude() * 1E6));
+			
+			item = new OverlayItem(geopoint, "My Location", null);
+			overlay.addItem(item);
+		}
+		
 		mapView.getOverlays().add(overlay);
+
  
 		// move to location
 		mapView.getController().animateTo(geopoint);
