@@ -53,12 +53,6 @@ public class MapTabActivity extends MapActivity {
 		// Display a marker at mexico city
 	    //addFriend(19240000,-99120000,drawable,"","");
 	}
-
-	public void addFriend(int lat, int lon, Drawable drawable, String title, String snippet)
-	{
-		GeoPoint point = new GeoPoint(lat,lon);
-		friendOverlay.addItem(new OverlayItem(point, title, snippet));
-	}
 	
 	protected void createAndShowItemizedOverlay(Location newLocation) {
 		List overlays = mapView.getOverlays();
@@ -94,8 +88,6 @@ public class MapTabActivity extends MapActivity {
 		mapView.postInvalidate();
 	}
  
-
-
     @Override
     protected boolean isRouteDisplayed() {
         return false;

@@ -5,10 +5,11 @@ import java.util.List;
  
 import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
- 
+
 import com.google.android.maps.ItemizedOverlay;
 import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
+
  
 public class BuddyOverlay extends ItemizedOverlay {
  
