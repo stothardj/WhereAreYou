@@ -1,6 +1,7 @@
 package gogodeX.GUI;
 
 import android.graphics.drawable.Drawable;
+import android.location.Location;
 import android.os.Bundle;
 import com.google.android.maps.*;
 
@@ -35,14 +36,13 @@ public class MapTabActivity extends MapActivity {
 		friendOverlay = new BuddyOverlay(drawable);
 		mapView.getOverlays().add(friendOverlay);
 		
-		// Display a marker at mexico city
-	    addFriend(19240000,-99120000,drawable,"","");
+		// Display a marker at Mexico City
+	    addFriend("Average","Joe","avgJoe",new OverlayItem(new GeoPoint(19240000,-99120000),"",""));
 	}
 
-	public void addFriend(int lat, int lon, Drawable drawable, String title, String snippet)
+	public void addFriend(String firstName, String lastName, String userName, OverlayItem overlay)
 	{
-		GeoPoint point = new GeoPoint(lat,lon);
-		friendOverlay.addOverlay(new OverlayItem(point, title, snippet));
+		friendOverlay.add("avgJoe", new User("Average","Joe","avgJoe", overlay));
 	}
 
 

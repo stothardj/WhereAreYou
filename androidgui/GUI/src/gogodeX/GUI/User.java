@@ -1,29 +1,21 @@
 package gogodeX.GUI;
 
 import com.google.android.maps.GeoPoint;
-
+import com.google.android.maps.OverlayItem;
 import android.location.Location;
 
 public class User {
-	private Location location;
 	private String firstName;
 	private String lastName;
 	private String userName;
+	private OverlayItem overlay;
 	
-	public User(Location l, String fName, String lName, String uName)
+	public User(String fName, String lName, String uName, OverlayItem o)
 	{
-		setLocation(l);
 		setFirstName(fName);
 		setLastName(lName);
 		setUserName(uName);
-	}
-
-	public void setLocation(Location location) {
-		this.location = location;
-	}
-
-	public Location getLocation() {
-		return location;
+		setOverlay(o);
 	}
 
 	public void setFirstName(String firstName) {
@@ -52,7 +44,15 @@ public class User {
 	
 	public GeoPoint getGeoPoint()
 	{
-		return new GeoPoint((int)(location.getLatitude()*1000000),(int)(location.getLongitude()*1000000));
+		return overlay.getPoint();
+	}
+
+	public void setOverlay(OverlayItem overlay) {
+		this.overlay = overlay;
+	}
+
+	public OverlayItem getOverlay() {
+		return overlay;
 	}
 
 }
