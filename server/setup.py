@@ -65,7 +65,7 @@ class StupidProtcol(protocol.ProcessProtocol):
     cursor.execute("CREATE TYPE account_type AS ENUM ('User')")
     cursor.execute("CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE')")
     cursor.execute("CREATE TABLE friends (\
-    username  varchar(50) PRIMARY KEY,\
+    username  varchar(50) NOT NULL,\
     friendname  varchar(50) NOT NULL,\
     status    friend_status NOT NULL\
     )")

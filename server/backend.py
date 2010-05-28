@@ -181,9 +181,6 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             if action == 'SHOWGPS':
               msg['Lat']=lat
               msg['Lon']=lon
-            else:
-              msg['Lat']=0
-              msg['Lon']=0
 
             sentLine = json.dumps(msg)
 
