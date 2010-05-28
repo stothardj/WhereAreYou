@@ -49,12 +49,14 @@ class StupidProtcol(protocol.ProcessProtocol):
 
     connection = pool.connect()
     cursor = connection.cursor()
-
+    print "This script will only work if you have already run the following command in psql:"
+    print "ALTER DATABASE "+setobj['Database']+" SET client_min_messages TO WARNING"
     cursor.execute("ALTER DATABASE "+setobj['Database']+" SET client_min_messages TO WARNING")
 
     cursor.execute("DROP TABLE IF EXISTS users")
     cursor.execute("DROP TABLE IF EXISTS zonenames")
     cursor.execute("DROP TABLE IF EXISTS friends")
+    cursor.execute("DROP TABLE IF EXISTS savedmessages")
 
     cursor.execute("DROP TYPE IF EXISTS friend_status")
     cursor.execute("DROP TYPE IF EXISTS account_type")
@@ -63,14 +65,14 @@ class StupidProtcol(protocol.ProcessProtocol):
     cursor.execute("CREATE TYPE account_type AS ENUM ('User')")
     cursor.execute("CREATE TYPE zone_action AS ENUM ('SHOWGPS', 'SHOWTEXT', 'HIDE')")
     cursor.execute("CREATE TABLE friends (\
-    username  varchar(50),\
+    username  varchar(50) PRIMARY KEY,\
     friendname  varchar(50) NOT NULL,\
     status    friend_status NOT NULL\
     )")
     cursor.execute("CREATE TABLE users (\
     firstname  varchar(50),\
     lastname  varchar(50),\
-    UserName  varchar(50),\
+    UserName  varchar(50) PRIMARY KEY,\
     Password  varchar(50),\
     accounttype  account_type,\
     lastloc    point\
@@ -81,6 +83,10 @@ class StupidProtcol(protocol.ProcessProtocol):
     zone    circle NOT NULL,\
     action      zone_action NOT NULL,\
     text        varchar(255)\
+    )")
+    cursor.execute("CREATE TABLE savedmessages (\
+    UserName  varchar(50) NOT NULL,\
+    Message  varchar(255) NOT NULL\
     )")
     connection.commit()
     cursor.release()
