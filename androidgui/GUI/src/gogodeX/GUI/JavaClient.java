@@ -45,6 +45,25 @@ public class JavaClient{
 		}
 	}
 	
+	public String readOneLine()
+	{
+		if(connected == true)
+		{
+			try
+			{
+				return in.readLine();
+			} 
+			catch (IOException e) 
+			{
+				return "";
+			}
+		}
+		else
+		{
+			return "";
+		}
+	}
+	
 	public String readLine() {
 		if(connected == true)
 		{

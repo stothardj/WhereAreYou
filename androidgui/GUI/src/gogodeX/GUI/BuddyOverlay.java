@@ -1,33 +1,55 @@
 package gogodeX.GUI;
 
 import java.util.ArrayList;
-
-import android.app.AlertDialog;
-import android.content.Context;
+import java.util.List;
+ 
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
+
 import com.google.android.maps.ItemizedOverlay;
+import com.google.android.maps.MapView;
 import com.google.android.maps.OverlayItem;
 
+ 
 public class BuddyOverlay extends ItemizedOverlay {
-	Context mContext;
-	private ArrayList<OverlayItem> mOverlays = new ArrayList<OverlayItem>();
-
+ 
+	private List items;
+	private Drawable marker;
+ 
 	public BuddyOverlay(Drawable defaultMarker) {
-		  super(boundCenterBottom(defaultMarker));
+		super(defaultMarker);
+		items = new ArrayList();
+		marker = defaultMarker;
 	}
-	
-	public void addOverlay(OverlayItem overlay) {
-	    mOverlays.add(overlay);
-	    populate();
-	}	
+ 
 	@Override
-	protected OverlayItem createItem(int i) {
-	  return mOverlays.get(i);
+	protected OverlayItem createItem(int index) {
+		return (OverlayItem)items.get(index);
 	}
-
+ 
 	@Override
 	public int size() {
-	  return mOverlays.size();
+		return items.size();
+ 
 	}
-
+ 
+	/*
+	 * (non-Javadoc)
+	 *
+	 * @see
+	 * com.google.android.maps.ItemizedOverlay#draw(android.graphics.Canvas,
+	 * com.google.android.maps.MapView, boolean)
+	 */
+	@Override
+	public void draw(Canvas canvas, MapView mapView, boolean shadow) {
+		super.draw(canvas, mapView, shadow);
+		boundCenterBottom(marker);
+ 
+	}
+ 
+	public void addItem(OverlayItem item) {
+		items.add(item);
+		populate();
+	}
+ 
 }

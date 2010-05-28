@@ -49,7 +49,7 @@ public class Createaccnt extends Activity{
 				JSONUser.key("First Name").value(Firstname.toString());
 				JSONUser.endObject();
 				client.sendLine(JSONUser.toString());
-				String response = client.readLine();
+				String response = client.readOneLine();
 		        final Context context = getApplicationContext();
 				JSONValidate = new JSONObject(response);
 				String responseType = JSONValidate.getString("Response Type");

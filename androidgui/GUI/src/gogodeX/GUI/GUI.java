@@ -61,7 +61,7 @@ public class GUI extends Activity {
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("169.232.93.156", 79);
+        client = new JavaClient("128.97.244.39", 79);
         //connected = connectToServer();
         
         next.setOnClickListener(new View.OnClickListener() {
@@ -149,7 +149,7 @@ public class GUI extends Activity {
 			JSONUser.key("Request Type").value("Login");
 			JSONUser.endObject();
 			client.sendLine(JSONUser.toString());
-			String response = client.readLine();
+			String response = client.readOneLine();
 			JSONValidate = new JSONObject(response);
 			String responseType = JSONValidate.getString("Response Type");
 			boolean isValidated = JSONValidate.getBoolean("Success");
