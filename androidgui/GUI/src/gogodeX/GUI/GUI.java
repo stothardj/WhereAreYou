@@ -1,7 +1,6 @@
 package gogodeX.GUI;
 
 import java.io.IOException;
-import java.net.SocketTimeoutException;
 import java.net.UnknownHostException;
 
 import org.json.JSONException;

@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+	android:layout_width="fill_parent"
+	android:layout_height="wrap_content"
+	android:padding="10dip">
+	<EditText
+		android:id="@+id/friend_name_textbox"
+		android:layout_width="fill_parent"
+		android:layout_height="wrap_content"
+		android:text="@string/friend_name_prompt"
+	/>
+	<Button
+		android:id="@+id/add_friend"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentRight="true"
+		android:text="@string/add_friend_button"
+		android:layout_below="@id/friend_name_textbox"
+	/>
+	<Button
+		android:id="@+id/remove_friend"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:layout_alignParentLeft="true"
+		android:text="@string/remove_friend_button"
+		android:layout_below="@id/friend_name_textbox"
+	/>
+	<ListView
+	    android:id="@android:id/list"
+	    android:layout_width="fill_parent"
+	    android:layout_height="wrap_content"
+	    android:layout_below="@id/remove_friend"
+    />
+</RelativeLayout>

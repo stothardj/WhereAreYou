@@ -22,6 +22,12 @@
 
     <string name="title_show_hide_toggle">Show/Hide</string>
     <string name="summary_show_hide_toggle">Click to toggle between show and hide.</string>
+    
+    <!-- Friends list -->
+    <string name="add_friend_button">Add Friend</string>
+    <string name="remove_friend_button">Remove Friend</string>
+    <string name="friend_name_prompt">Friend Name</string>
+    
 <string name="title_polling">Polling Frequency</string>
 <string name="summary_polling">Select your desired polling frequency.</string>
 </resources>
