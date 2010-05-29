@@ -36,7 +36,6 @@ public class GUI extends Activity {
     private Context context;
     private int duration;
     private Intent startUpdatingCoordinates;
-    private static boolean connected;
     private boolean validated;
 	
     @Override
@@ -54,7 +53,6 @@ public class GUI extends Activity {
         	}
         });
         
-        connected = false;
         userName = (EditText) findViewById(R.id.username);
         password = (EditText) findViewById(R.id.password);
         context = getApplicationContext();
@@ -76,17 +74,26 @@ public class GUI extends Activity {
 	            		Toast.makeText(context, text, duration).show();	
 	            		return;	
 	            	}
-	            	else if(connected == false)
+	            	else if(client.getConnected() == false)
 	            	{ 
-	            		connected = connectToServer();
-	            		if(connected == true)
+	            		connectToServer();
+	            		if(client.getConnected() == true)
 	            		{
 	            			validated = validateUser();
 	            			if(validated == false)
 		            		{
-		            			CharSequence text = "Sorry, User Name and/or Password not Found!";
-		            			Toast.makeText(context, text, duration).show();
-		            			return;	
+	            				if (client.getConnected() == true)
+	            				{
+	            					CharSequence text = "Sorry, User Name and/or Password not Found!";
+	            					Toast.makeText(context, text, duration).show();
+	            					return;	
+	            				}
+	            				else
+	            				{
+	            					CharSequence text = "Unable to Connect to the Server";
+	            					Toast.makeText(context, text, duration).show();
+	            					return;	
+	            				}
 		            		}
 	            		
 	            			startService(startUpdatingCoordinates);
@@ -106,9 +113,18 @@ public class GUI extends Activity {
             			validated = validateUser();
             			if(validated == false)
 	            		{
-	            			CharSequence text = "Sorry, User Name and/or Password not Found!";
-	            			Toast.makeText(context, text, duration).show();
-	            			return;	
+            				if (client.getConnected() == true)
+            				{
+            					CharSequence text = "Sorry, User Name and/or Password not Found!";
+            					Toast.makeText(context, text, duration).show();
+            					return;	
+            				}
+            				else
+            				{
+            					CharSequence text = "Unable to Connect to the Server";
+            					Toast.makeText(context, text, duration).show();
+            					return;	
+            				}
 	            		}
             		
             			startService(startUpdatingCoordinates);
@@ -178,15 +194,4 @@ public class GUI extends Activity {
     {
     	LM = GUI.LM;
     }
-    
-    public static boolean getConnected()
-    {
-    	return connected;
-    }
-    
-    public static void setConnected(boolean connect)
-    {
-    	connected = connect;
-    }
-
 }

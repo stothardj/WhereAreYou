@@ -49,7 +49,7 @@ public class JavaClient{
 	{
 		if(connected == true)
 		{
-			String s = "";
+			String s = null;
 			try
 			{
 				s = in.readLine();
@@ -59,11 +59,13 @@ public class JavaClient{
 				}
 				else
 				{
+					connected = false;
 					return "";
 				}
 			} 
 			catch (IOException e) 
 			{
+				connected = false;
 				return "";
 			}
 		}
@@ -169,6 +171,11 @@ public class JavaClient{
 				break;
 			}				
 		}		
+	}
+	
+	public boolean getConnected()
+	{
+		return connected;
 	}
 	
 	//public:

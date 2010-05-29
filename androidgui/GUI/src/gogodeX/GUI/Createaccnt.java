@@ -97,21 +97,30 @@ public class Createaccnt extends Activity{
         	{
         		if(pass.equals(pass2))
         		{
-        			if(!GUI.getConnected())
+        			if(!client.getConnected())
         			{
-        				GUI.setConnected(connectToServer());
+        				connectToServer();
         			}
         			
-        			if(GUI.getConnected()){
+        			if(client.getConnected()){
         			boolean created = createUser();
         			if(created){
 	        		Intent myIntent = new Intent(view.getContext(), GUI.class);
 	        		startActivity(myIntent);
         			}
         			else{
-            			CharSequence errorText = "Unable to create account. Please try again.";
-            			Toast.makeText(context, errorText,15).show();
-            			return;
+        				if(client.getConnected() == true)
+        				{
+        					CharSequence errorText = "Unable to create account. Please try again.";
+        					Toast.makeText(context, errorText,15).show();
+        					return;
+        				}
+        				else
+        				{
+        					CharSequence errorText = "Unable to Connect to the Server. Please try again.";
+        					Toast.makeText(context, errorText,15).show();
+        					return;	
+        				}
         			}
         			}
         			else{
