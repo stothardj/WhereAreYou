@@ -49,9 +49,18 @@ public class JavaClient{
 	{
 		if(connected == true)
 		{
+			String s = "";
 			try
 			{
-				return in.readLine();
+				s = in.readLine();
+				if(s != null)
+				{
+					return s;
+				}
+				else
+				{
+					return "";
+				}
 			} 
 			catch (IOException e) 
 			{
