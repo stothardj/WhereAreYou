@@ -88,6 +88,14 @@ public class FriendsList extends ListActivity {
 						String name = jo.getString("Friend Name");
 						m_list.remove(name+"\t\t(Pending)");
 						m_list.add(name);
+					} else if(resT.equals("Friend Request"))
+					{
+						String name = jo.getString("From User");
+						m_list.add("name");
+		        		Context context = getApplicationContext();
+		        		int duration = Toast.LENGTH_SHORT;
+	            		Toast toast = Toast.makeText(context, "Received friend request from "+name, duration);
+	            		toast.show();
 					}
 					
 				} catch (JSONException e) {
