@@ -161,8 +161,25 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         if self.username != None:
           pool.runOperation("DELETE FROM friends WHERE (username=E%s AND friendname=E%s) OR (username=E%s AND friendname=E%s)",
           (self.username, o['Friend Name'], o['Friend Name'], self.username))
+          msg = {}
+          msg['Response Type']='Friend Removed'
+          msg['Friend Name']=self.username
+          self.sendToOthers(json.dumps(msg), [o['Friend Name']], save = True)
 
         return "Removed a friend!"
+
+      def parseRefreshFriends(o):
+        if self.username != None:
+          def _compileFriends(flist):
+            #Separate friend name and status by comma. Separate each entry by period
+            s = ". ".join(map(", ".join, flist))
+            msg = {}
+            msg['Response Type']='Friend List'
+            msg['Friend List']=s
+            self.sendLine(json.dumps(msg))
+
+          pool.runQuery("SELECT FriendName, Status FROM friends WHERE UserName=E%s", self.username).addCallback(_compileFriends)
+        return "Sent back friends list!"
 
       def parseUpdateCoord(o):
         if self.username != None:
@@ -254,10 +271,15 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
         return "Logged in!"
 
+      def parseLogout(o):
+        self.logout()
+        return "Logged out!"
+
       parser = {'Create User': parseCreateUser, 'Remove User': parseRemoveUser,
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
-      parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin}
+      parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin,
+      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):

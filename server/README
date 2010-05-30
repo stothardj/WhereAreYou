@@ -71,11 +71,17 @@ Fields: Friend Name
 Request Type: Remove Friend
 Fields: Friend Name
 
+Request Type: Refresh Friends
+Fields: None
+
 Request Type: Update Coordinate
 Fields: Lat, Lon
 
 Request Type: Login
 Fields: User Name, Password
+
+Request Type: Logout
+Fields: None
 
 JSON API (Testing only)
 
@@ -111,11 +117,16 @@ Response Type: Friend Requested
 Fields: Friend Name, Success
 
 Response Type: Friend Accepted
-Fields: Frien Name
-
-#EDITED to add Action specifier along with text or lat/lon.
-Response Type: Position Update
-Fields: User Name, Action, Lat, Lon, Text
+Fields: Friend Name
 
 Response Type: Friend Request
 Fields: From User
+
+Response Type: Friend Removed
+Fields: Friend Name
+
+Response Type: Friend List
+Fields: Friend List
+
+Response Type: Position Update
+Fields: User Name, Action, Lat, Lon, Text
