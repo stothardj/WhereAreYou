@@ -39,6 +39,7 @@ public class MapTabActivity extends MapActivity {
 	
 	protected static void createAndShowItemizedOverlay() 
 	{
+		/*
 		List overlays = mapView.getOverlays();
  
 		// first remove old overlay
@@ -53,7 +54,7 @@ public class MapTabActivity extends MapActivity {
 			}
 		}
  
-		Collection<User> userCollection = MessageHandler.getFriendsList().values();
+		//Collection<User> userCollection = MessageHandler.getFriendsList().values();
 		GeoPoint geopoint = new GeoPoint(0,0);
 		icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
 		Location newLocation;
@@ -73,6 +74,7 @@ public class MapTabActivity extends MapActivity {
 			overlay.addItem(item);
 		}
 		
+		
 		mapView.getOverlays().add(overlay);
 
  
@@ -81,6 +83,7 @@ public class MapTabActivity extends MapActivity {
  
 		// redraw map
 		mapView.postInvalidate();
+		*/
 	}
  
     @Override

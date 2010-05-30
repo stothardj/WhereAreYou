@@ -25,6 +25,15 @@
 		android:text="@string/remove_friend_button"
 		android:layout_below="@id/friend_name_textbox"
 	/>
+	<Button
+		android:id="@+id/accept_friend"
+		android:layout_width="wrap_content"
+		android:layout_height="wrap_content"
+		android:text="@string/accept_friend_button"
+		android:layout_below="@id/friend_name_textbox"
+		android:layout_toLeftOf="@id/add_friend"
+		android:layout_toRightOf="@id/remove_friend"
+	/>
 	<ListView
 	    android:id="@android:id/list"
 	    android:layout_width="fill_parent"

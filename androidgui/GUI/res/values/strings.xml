@@ -26,6 +26,7 @@
     <!-- Friends list -->
     <string name="add_friend_button">Add Friend</string>
     <string name="remove_friend_button">Remove Friend</string>
+    <string name="accept_friend_button">Accept Friend</string>
     <string name="friend_name_prompt">Friend Name</string>
     
 <string name="title_polling">Polling Frequency</string>

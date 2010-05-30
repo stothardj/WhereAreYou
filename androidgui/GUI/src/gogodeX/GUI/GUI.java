@@ -46,7 +46,7 @@ public class GUI extends Activity {
         
         creation.setOnClickListener(new View.OnClickListener(){
         	public void onClick(View view) {
-        		Intent myIntent2 = new Intent(view.getContext(), Createaccnt.class); // change the 
+        		Intent myIntent2 = new Intent(view.getContext(), CreateAccount.class); // change the 
         		startActivity(myIntent2);						// Createaccnt.class to Tabs.class if you
         														// want to test the stuff in the tabs w/o a server
         	}
@@ -58,7 +58,7 @@ public class GUI extends Activity {
         duration = Toast.LENGTH_SHORT;
         startUpdatingCoordinates = new Intent(this, GPSUpdater.class);
         
-        client = new JavaClient("169.232.101.67", 79);
+        client = new JavaClient("169.232.239.178", 79);
         //connected = connectToServer();
         
         next.setOnClickListener(new View.OnClickListener() {

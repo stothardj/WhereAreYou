@@ -3,11 +3,18 @@
     android:layout_width="fill_parent"
     android:layout_height="wrap_content"
     android:padding="10dip">
+    <ImageView
+    	android:id="@+id/gogologo"
+    	android:layout_width="fill_parent"
+    	android:layout_height="wrap_content"
+    	android:src="@drawable/gogologo"
+    />
     <TextView
         android:id="@+id/username_label"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:text="@string/username_prompt"/>
+        android:text="@string/username_prompt"
+        android:layout_below="@id/gogologo"/>
     <EditText
         android:id="@+id/username"
         android:layout_width="fill_parent"
