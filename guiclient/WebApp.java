@@ -15,7 +15,6 @@ public class WebApp extends BaseApplet {
 		
 		getContentPane().setLayout(new GridLayout(3, 1));
 		
-		
 		buttonPanel.setLayout(new GridLayout(4,4));
 		
 		LinkedList<String> commands = new LinkedList<String>();
