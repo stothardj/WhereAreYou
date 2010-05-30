@@ -91,7 +91,7 @@ public class FriendsList extends ListActivity {
 					} else if(resT.equals("Friend Request"))
 					{
 						String name = jo.getString("From User");
-						m_list.add("name");
+						m_list.add(name+"\t\t(Unaccepted)");
 		        		Context context = getApplicationContext();
 		        		int duration = Toast.LENGTH_SHORT;
 	            		Toast toast = Toast.makeText(context, "Received friend request from "+name, duration);
