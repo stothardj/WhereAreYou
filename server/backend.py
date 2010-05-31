@@ -172,9 +172,13 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         if self.username != None:
           def _compileFriends(flist):
             #Separate friend name and status by comma. Separate each entry by period
+            def reformatCoord(list):
+              s = list[2]
+              (lat, _, lon) = s.replace('(','').replace(')','').partition(',')
+              return [list[0], list[1], float(lat), float(lon)]
             msg = {}
             msg['Response Type']='Friend List'
-            msg['Friend List']=flist
+            msg['Friend List']=map(reformatCoord, flist)
             self.sendLine(json.dumps(msg))
 
           pool.runQuery("SELECT FriendName, Status, lastloc FROM users INNER JOIN friends ON users.username=friends.username WHERE users.username=E%s", self.username).addCallback(_compileFriends)

@@ -9,6 +9,7 @@ public class User {
 	private String lastName;
 	private String userName;
 	private Location userLocation;
+	private String validation;
 	
 	public User(String uName, Location l)
 	{
@@ -22,7 +23,13 @@ public class User {
 
 	public String getUserName() {
 		return userName;
-	}	
+	}
+	public void setValidation(String validation) {
+		this.validation = validation;
+	}
+	public String getValidation() {
+		return validation;
+	}
 	
 	public Location getLocation()
 	{

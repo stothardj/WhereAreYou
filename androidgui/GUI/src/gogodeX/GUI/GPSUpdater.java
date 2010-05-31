@@ -17,6 +17,8 @@ import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
 import android.widget.TextView;
+import android.widget.Toast;
+
 import org.json.*;
 
 
@@ -41,7 +43,9 @@ public class GPSUpdater extends Service {
 	private static String mocLocationProvider;
 	private String JSONString;
 	
+	private String currentTab;
 	private HashMap<String, Messenger> messengers;
+	private HashMap<String, User> friends;
 	
 	@Override
 	public void onCreate()
@@ -54,6 +58,20 @@ public class GPSUpdater extends Service {
 		//GUI.getLM(LM);
 		//Start the main GPS updating loop
 		GPSHandler();
+		retrieveFriends();
+	}
+	
+	public void retrieveFriends(){
+		friends = new HashMap<String, User>();
+		JSONStringer refresh = new JSONStringer();
+		try {
+			refresh.object();
+			refresh.key("Request Type").value("Refresh Friends");
+	    	refresh.endObject();
+	    	GUI.getClient().sendLine(refresh.toString());
+		} catch (JSONException e) {
+			e.printStackTrace();
+		}
 	}
 	
 	public void waitForMessage()
@@ -134,27 +152,146 @@ public class GPSUpdater extends Service {
 		final Handler mHandler = new Handler() {
 			@Override
 			public void handleMessage(Message msg) {
-				String mWhoAmI = (String) msg.getData().get("whoami");
-				Messenger mMessenger = (Messenger) msg.getData().get("messenger");
-				messengers.put(mWhoAmI, mMessenger);
+				//Listener of interprocess communication
+				Bundle b = msg.getData();
+				String msgType =  b.getString("Message Type");
+				if(msgType.equals("Pass Messenger")) {
+					String mWhoAmI = b.getString("whoami");
+					Messenger mMessenger = (Messenger) b.get("messenger");
+					messengers.put(mWhoAmI, mMessenger);
+					currentTab = mWhoAmI;
+
+				} else if(msgType.equals("Declare Active")) {
+					currentTab = b.getString("whoami");
+				}
+				
+				//Send full friends list to friends tab once it is created
+				if(msgType.equals("Pass Messenger") && currentTab.equals("Friends List")) {
+					Message mess = Message.obtain();
+					Bundle bo = new Bundle();
+					bo.putString("Message Type", "Friend List");
+					String[] farray = new String[friends.size()];
+					int i = 0;
+					for(String name : friends.keySet()) {
+						User u = friends.get(name);
+						String s = name;
+						if(!u.getValidation().equals("Accepted"))
+							s += "\t\t("+u.getValidation()+")";
+						farray[i] = s;
+						i++;
+					}
+					bo.putStringArray("Friend List", farray);
+					mess.setData(bo);
+					try {
+						messengers.get(currentTab).send(mess);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
+				}
+				
+				
+				
+				/*
+				Message mess = Message.obtain();
+				Bundle bo = new Bundle();
+				bo.putString("Message Type", "Toast");
+				bo.putString("Toast Message", "I think "+currentTab+" is the current tab.");
+				mess.setData(bo);
+				try {
+					messengers.get(currentTab).send(mess);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+				*/
+				
 			}
 		};
 		final Runnable mh = new Runnable() {
 			public void run() {
-				Message mess = Message.obtain();
-				Bundle b = new Bundle();
-				b.putString("JSON", JSONString);
-				mess.setData(b);
+				//Parse messages from server
+				//By the time this is called the message is saved
+				//in JSONString (cannot put 'this' since inside Runnable)
 				
-				String sendTo = null;
-				if(JSONString.contains("Friend"))
-					sendTo = "FriendsList";
 				try {
-					messengers.get(sendTo).send(mess);
+					JSONObject jo = new JSONObject(JSONString);
+					String resT = jo.getString("Response Type");
+					if(resT.equals("Friend List")) {
+						JSONArray flist = jo.getJSONArray("Friend List");
+						for(int i=0; i<flist.length(); i++) {
+							JSONArray friend = flist.getJSONArray(i);
+							String name = friend.getString(0);
+							String status = friend.getString(1);
+							double lat = friend.getDouble(2);
+							double lon = friend.getDouble(3);
+							Location loc =  new Location("gps");
+							loc.setLatitude(lat);
+							loc.setLongitude(lon);
+							User user = new User(name, loc);
+							user.setValidation(status);
+							friends.put(name, user);
+						}
+					}
+					else if(resT.equals("Friend Requested")) {
+						if(jo.getBoolean("Success")) {
+							if(messengers.containsKey("Friends List")) {
+								Message mess = Message.obtain();
+								Bundle bo = new Bundle();
+								bo.putString("Message Type", "Friend Requested");
+								bo.putString("Friend Name", jo.getString("Friend Name"));
+								mess.setData(bo);
+								messengers.get("Friends List").send(mess);
+							}
+						}
+						else
+						{
+							Message mess = Message.obtain();
+							Bundle bo = new Bundle();
+							bo.putString("Message Type", "Toast");
+							bo.putString("Toast Message", "Cannot request "+jo.getString("Friend Name"));
+			        		mess.setData(bo);
+			        		messengers.get(currentTab).send(mess);
+						}
+					} else if(resT.equals("Friend Accepted"))
+					{
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Toast");
+						bo.putString("Toast Message", jo.getString("Friend Name")+ " accepted your friend request.");
+		        		mess.setData(bo);
+		        		messengers.get(currentTab).send(mess);
+						
+		        		if(messengers.containsKey("Friends List")) {
+			        		Message mess2 = Message.obtain();
+			        		Bundle bo2 = new Bundle();
+			        		bo2.putString("Message Type", "Friend Accepted");
+			        		bo2.putString("Friend Name", jo.getString("Friend Name"));
+			        		mess2.setData(bo2);
+			        		messengers.get("Friends List").send(mess2);
+		        		}
+					} else if(resT.equals("Friend Request"))
+					{
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Toast");
+						bo.putString("Toast Message", jo.getString("From User")+ " wants to be your friend.");
+		        		mess.setData(bo);
+		        		messengers.get(currentTab).send(mess);
+		        		
+		        		if(messengers.containsKey("Friends List")) {
+		        			Message mess2 = Message.obtain();
+		        			Bundle bo2 = new Bundle();
+		        			bo2.putString("Message Type", "Friend Request");
+		        			bo2.putString("From User", jo.getString("From User"));
+		        			mess2.setData(bo2);
+		        			messengers.get("Friends List").send(mess2);
+		        		}
+					}
+				} catch(JSONException e) {
+					e.printStackTrace();
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
+				
 			}
 		};
 	    t = new Thread() {

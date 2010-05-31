@@ -4,9 +4,20 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 
+import android.content.ComponentName;
+import android.content.Context;
+import android.content.Intent;
+import android.content.ServiceConnection;
 import android.graphics.drawable.Drawable;
 import android.location.Location;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.IBinder;
+import android.os.Message;
+import android.os.Messenger;
+import android.os.RemoteException;
+import android.widget.Toast;
+
 import com.google.android.maps.*;
 
 public class MapTabActivity extends MapActivity {
@@ -14,6 +25,7 @@ public class MapTabActivity extends MapActivity {
 	private static MapView mapView;
 	private static Drawable icon;
 	private static MyLocationOverlay myLocOverlay;
+	private Messenger mSender;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
@@ -35,6 +47,61 @@ public class MapTabActivity extends MapActivity {
 		
 		createAndShowItemizedOverlay();
 
+    	////////////// Setup Two Way Communication ////////////////////
+    	final Handler mHandler = new Handler() {
+    		@Override
+    		public void handleMessage(Message msg) {
+    			Bundle b = msg.getData();
+    			String msgType = b.getString("Message Type");
+    			if(msgType.equals("Toast")) {
+	        		Context context = getApplicationContext();
+	        		int duration = Toast.LENGTH_SHORT;
+            		Toast toast = Toast.makeText(context, b.getString("Toast Message"), duration);
+            		toast.show();
+    			}
+    		}
+    	};
+    	final Messenger mReceiver = new Messenger(mHandler);
+		ServiceConnection conn = new ServiceConnection() {
+			@Override
+			public void onServiceConnected(ComponentName name, IBinder service) {
+				mSender = new Messenger(service);
+				try {
+					Message mess = Message.obtain();
+					Bundle b = new Bundle();
+					b.putString("Message Type", "Pass Messenger");
+					b.putString("whoami", "Map");
+					b.putParcelable("messenger", mReceiver);
+					mess.setData(b);
+					mSender.send(mess);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+			@Override
+			public void onServiceDisconnected(ComponentName name) {}
+		};
+		Intent mIntent =  new Intent(MapTabActivity.this, GPSUpdater.class);
+		this.getApplicationContext().bindService(mIntent, conn, 0);
+		//////////////Setup Two Way Communication ////////////////////
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(mSender != null) {
+			Message mess = Message.obtain();
+			Bundle b = new Bundle();
+			b.putString("Message Type", "Declare Active");
+			b.putString("whoami", "Map");
+			mess.setData(b);
+			try {
+				mSender.send(mess);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 	
 	protected static void createAndShowItemizedOverlay() 

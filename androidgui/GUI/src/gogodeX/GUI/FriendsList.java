@@ -25,6 +25,7 @@ public class FriendsList extends ListActivity {
 	private ArrayAdapter<String> m_list;
 	int row = -1;
 	private FriendsList ref = this;
+	private Messenger mSender = null;
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {		
@@ -64,73 +65,77 @@ public class FriendsList extends ListActivity {
 			}
 		});
        
+    	
+    	////////////// Setup Two Way Communication ////////////////////
     	final Handler mHandler = new Handler() {
     		@Override
     		public void handleMessage(Message msg) {
-    			try {
-    				String mJSON = msg.getData().getString("JSON");
-    				
-					JSONObject jo = new JSONObject(mJSON);
-					String resT = jo.getString("Response Type");
-					if(resT.equals("Friend Requested"))
-					{
-						if(jo.getBoolean("Success"))
-							m_list.add(jo.getString("Friend Name") + "\t\t(Pending)");
-						else
-						{
-			        		Context context = getApplicationContext();
-			        		int duration = Toast.LENGTH_SHORT;
-		            		Toast toast = Toast.makeText(context, "Cannot request "+jo.getString("Friend Name"), duration);
-		            		toast.show();
-						}
-					} else if(resT.equals("Friend Accepted"))
-					{
-						String name = jo.getString("Friend Name");
-						m_list.remove(name+"\t\t(Pending)");
-						m_list.add(name);
-					} else if(resT.equals("Friend Request"))
-					{
-						String name = jo.getString("From User");
-						m_list.add(name+"\t\t(Unaccepted)");
-		        		Context context = getApplicationContext();
-		        		int duration = Toast.LENGTH_SHORT;
-	            		Toast toast = Toast.makeText(context, "Received friend request from "+name, duration);
-	            		toast.show();
-					}
-					
-				} catch (JSONException e) {
-					e.printStackTrace();
-				}
-    			
+    			Bundle b = msg.getData();
+    			String msgType = b.getString("Message Type");
+    			if(msgType.equals("Toast")) {
+	        		Context context = getApplicationContext();
+	        		int duration = Toast.LENGTH_SHORT;
+            		Toast toast = Toast.makeText(context, b.getString("Toast Message"), duration);
+            		toast.show();
+    			} else if(msgType.equals("Friend List")) {
+    				String[] farray = b.getStringArray("Friend List");
+    				for(String s : farray) {
+    					m_list.add(s);
+    				}
+    			} else if(msgType.equals("Friend Requested")) {
+    				m_list.add(b.getString("Friend Name") + "\t\t(Pending)");
+    			} else if(msgType.equals("Friend Accepted")) {
+					String name = b.getString("Friend Name");
+					m_list.remove(name+"\t\t(Pending)");
+					m_list.add(name);
+    			} else if(msgType.equals("Friend Request")) {
+					String name = b.getString("From User");
+					m_list.add(name+"\t\t(Unaccepted)");
+    			}
     		}
     	};
-    	final Messenger mMessenger = new Messenger(mHandler);
-    	
+    	final Messenger mReceiver = new Messenger(mHandler);
 		ServiceConnection conn = new ServiceConnection() {
 			@Override
 			public void onServiceConnected(ComponentName name, IBinder service) {
-				// TODO Auto-generated method stub
-				Messenger m = new Messenger(service);
+				mSender = new Messenger(service);
 				try {
 					Message mess = Message.obtain();
 					Bundle b = new Bundle();
-					b.putString("whoami", "FriendsList");
-					b.putParcelable("messenger", mMessenger);
+					b.putString("Message Type", "Pass Messenger");
+					b.putString("whoami", "Friends List");
+					b.putParcelable("messenger", mReceiver);
 					mess.setData(b);
-					m.send(mess);
+					mSender.send(mess);
 				} catch (RemoteException e) {
-					// TODO Auto-generated catch block
 					e.printStackTrace();
 				}
 			}
 			@Override
-			public void onServiceDisconnected(ComponentName name) {
-				// TODO Auto-generated method stub
-			}
+			public void onServiceDisconnected(ComponentName name) {}
 		};
 		Intent mIntent =  new Intent(FriendsList.this, GPSUpdater.class);
-		boolean success = this.getApplicationContext().bindService(mIntent, conn, 0);
-		System.out.println(success);
+		this.getApplicationContext().bindService(mIntent, conn, 0);
+		//////////////Setup Two Way Communication ////////////////////
+		
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		
+		if(mSender != null) {
+			Message mess = Message.obtain();
+			Bundle b = new Bundle();
+			b.putString("Message Type", "Declare Active");
+			b.putString("whoami", "Friends List");
+			mess.setData(b);
+			try {
+				mSender.send(mess);
+			} catch (RemoteException e) {
+				e.printStackTrace();
+			}
+		}
 	}
 
     protected void onListItemClick(ListView l, View v, int position, long id) {
