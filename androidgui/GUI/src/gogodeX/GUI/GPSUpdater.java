@@ -304,7 +304,7 @@ public class GPSUpdater extends Service {
 						
 						friends.remove(jo.getString("Friend Name"));
 						
-						if(messengers.containsKey("Friend List")) {
+						if(messengers.containsKey("Friends List")) {
 		        			Message mess2 = Message.obtain();
 		        			Bundle bo2 = new Bundle();
 		        			bo2.putString("Message Type", "Friend Removed");
