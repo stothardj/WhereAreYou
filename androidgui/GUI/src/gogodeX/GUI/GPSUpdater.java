@@ -240,14 +240,18 @@ public class GPSUpdater extends Service {
 					}
 					else if(resT.equals("Friend Requested")) {
 						if(jo.getBoolean("Success")) {
+							String name = jo.getString("Friend Name");
 							if(messengers.containsKey("Friends List")) {
 								Message mess = Message.obtain();
 								Bundle bo = new Bundle();
 								bo.putString("Message Type", "Friend Requested");
-								bo.putString("Friend Name", jo.getString("Friend Name"));
+								bo.putString("Friend Name", name);
 								mess.setData(bo);
 								messengers.get("Friends List").send(mess);
 							}
+							User u = new User(name, null);
+							u.setValidation("Pending");
+							friends.put(name, u);
 						}
 						else
 						{
@@ -285,10 +289,11 @@ public class GPSUpdater extends Service {
 		        		}
 					} else if(resT.equals("Friend Request"))
 					{
+						String name = jo.getString("From User");
 						Message mess = Message.obtain();
 						Bundle bo = new Bundle();
 						bo.putString("Message Type", "Toast");
-						bo.putString("Toast Message", jo.getString("From User")+ " wants to be your friend.");
+						bo.putString("Toast Message", name + " wants to be your friend.");
 		        		mess.setData(bo);
 		        		messengers.get(currentTab).send(mess);
 		        		
@@ -296,10 +301,15 @@ public class GPSUpdater extends Service {
 		        			Message mess2 = Message.obtain();
 		        			Bundle bo2 = new Bundle();
 		        			bo2.putString("Message Type", "Friend Request");
-		        			bo2.putString("From User", jo.getString("From User"));
+		        			bo2.putString("From User", name);
 		        			mess2.setData(bo2);
 		        			messengers.get("Friends List").send(mess2);
 		        		}
+		        		
+		        		User u = new User(name, null);
+						u.setValidation("Unaccepted");
+						friends.put(name, u);
+		        		
 					} else if(resT.equals("Friend Removed")) {
 
 						if(messengers.containsKey("Friends List")) {
