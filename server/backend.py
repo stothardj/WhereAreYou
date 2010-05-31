@@ -172,13 +172,12 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         if self.username != None:
           def _compileFriends(flist):
             #Separate friend name and status by comma. Separate each entry by period
-            s = ". ".join(map(", ".join, flist))
             msg = {}
             msg['Response Type']='Friend List'
-            msg['Friend List']=s
+            msg['Friend List']=flist
             self.sendLine(json.dumps(msg))
 
-          pool.runQuery("SELECT FriendName, Status FROM friends WHERE UserName=E%s", self.username).addCallback(_compileFriends)
+          pool.runQuery("SELECT FriendName, Status, lastloc FROM users INNER JOIN friends ON users.username=friends.username WHERE users.username=E%s", self.username).addCallback(_compileFriends)
         return "Sent back friends list!"
 
       def parseUpdateCoord(o):
@@ -234,11 +233,15 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
         return "Updated position!"
 
+      def parseGetSaved(o):
+        if self.username != None:
+          def _sendMessages(messages):
+            for m in messages:
+              self.sendLine(m[0])
+            pool.runOperation("DELETE FROM savedmessages WHERE UserName=E%s", self.username)
+          pool.runQuery("SELECT message FROM savedmessages WHERE UserName=E%s", self.username).addCallback(_sendMessages)
+
       def parseLogin(o):
-        def _sendMessages(messages):
-          for m in messages:
-            self.sendLine(m[0])
-          pool.runOperation("DELETE FROM savedmessages WHERE UserName=E%s", self.username)
 
         def login():
           if self.username != None:
@@ -246,7 +249,6 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           self.username = o['User Name']
           self.factory.loginUser(o['User Name'], self)
           print "User name is now ", self.username
-          pool.runQuery("SELECT message FROM savedmessages WHERE UserName=E%s", self.username).addCallback(_sendMessages)
 
         def validateUser(users):
           msg = {}
@@ -279,7 +281,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin,
-      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout}
+      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout, 'Get Saved': parseGetSaved}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):
