@@ -301,9 +301,7 @@ public class GPSUpdater extends Service {
 		        			messengers.get("Friends List").send(mess2);
 		        		}
 					} else if(resT.equals("Friend Removed")) {
-						
-						friends.remove(jo.getString("Friend Name"));
-						
+
 						if(messengers.containsKey("Friends List")) {
 		        			Message mess2 = Message.obtain();
 		        			Bundle bo2 = new Bundle();
@@ -315,6 +313,8 @@ public class GPSUpdater extends Service {
 		        			mess2.setData(bo2);
 		        			messengers.get("Friends List").send(mess2);							
 						}
+						
+						friends.remove(jo.getString("Friend Name"));
 					}
 				} catch(JSONException e) {
 					e.printStackTrace();
