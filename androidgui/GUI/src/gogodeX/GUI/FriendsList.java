@@ -96,7 +96,7 @@ public class FriendsList extends ListActivity {
     				if(val.equals("Accepted"))
     					m_list.remove(b.getString("Friend Name"));
     				else
-    					m_list.remove(b.getString("Friend Name\t\t("+val+")"));
+    					m_list.remove(b.getString("Friend Name")+"\t\t("+val+")");
     			}
     		}
     	};
