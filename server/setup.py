@@ -84,10 +84,6 @@ class StupidProtcol(protocol.ProcessProtocol):
     action      zone_action NOT NULL,\
     text        varchar(255)\
     )")
-    cursor.execute("CREATE TABLE savedmessages (\
-    UserName  varchar(50) NOT NULL,\
-    Message  varchar(255) NOT NULL\
-    )")
     connection.commit()
     cursor.release()
     #Ugly way to probably avoid data race

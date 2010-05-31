@@ -163,6 +163,10 @@ public class GPSUpdater extends Service {
 
 				} else if(msgType.equals("Declare Active")) {
 					currentTab = b.getString("whoami");
+				} else if(msgType.equals("Accept Friend")) {
+					friends.get(b.getString("Friend Name")).setValidation("Accepted");
+				} else if(msgType.equals("Remove Friend")) {
+					friends.remove(b.getString("Friend Name"));
 				}
 				
 				//Send full friends list to friends tab once it is created
@@ -253,18 +257,26 @@ public class GPSUpdater extends Service {
 						}
 					} else if(resT.equals("Friend Accepted"))
 					{
+						String name = jo.getString("Friend Name");
+						
 						Message mess = Message.obtain();
 						Bundle bo = new Bundle();
 						bo.putString("Message Type", "Toast");
-						bo.putString("Toast Message", jo.getString("Friend Name")+ " accepted your friend request.");
+						bo.putString("Toast Message", name + " accepted your friend request.");
 		        		mess.setData(bo);
 		        		messengers.get(currentTab).send(mess);
+		        		
+		        		Location loc = new Location("gps");
+		        		loc.setLatitude(jo.getDouble("Lat"));
+		        		loc.setLongitude(jo.getDouble("Lon"));
+		        		User u = new User(name, loc);
+		        		friends.put(name, u);
 						
 		        		if(messengers.containsKey("Friends List")) {
 			        		Message mess2 = Message.obtain();
 			        		Bundle bo2 = new Bundle();
 			        		bo2.putString("Message Type", "Friend Accepted");
-			        		bo2.putString("Friend Name", jo.getString("Friend Name"));
+			        		bo2.putString("Friend Name", name);
 			        		mess2.setData(bo2);
 			        		messengers.get("Friends List").send(mess2);
 		        		}
@@ -285,6 +297,21 @@ public class GPSUpdater extends Service {
 		        			mess2.setData(bo2);
 		        			messengers.get("Friends List").send(mess2);
 		        		}
+					} else if(resT.equals("Friend Removed")) {
+						
+						friends.remove(jo.getString("Friend Name"));
+						
+						if(messengers.containsKey("Friend List")) {
+		        			Message mess2 = Message.obtain();
+		        			Bundle bo2 = new Bundle();
+		        			bo2.putString("Message Type", "Friend Removed");
+		        			String name = jo.getString("Friend Name");
+		        			String val = friends.get(name).getValidation();
+		        			bo2.putString("Friend Name", name);
+		        			bo2.putString("Validation", val);
+		        			mess2.setData(bo2);
+		        			messengers.get("Friends List").send(mess2);							
+						}
 					}
 				} catch(JSONException e) {
 					e.printStackTrace();

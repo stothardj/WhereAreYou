@@ -47,16 +47,11 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
     self.logout()
     print "Connection lost!"
 
-  def sendToOthers(self, msg, namelist, **kwargs):
-    #save = If the user is not currently logged in, should the json be
-    #saved in a table to be sent to that user when they login?
-    saveJson = kwargs.get('save', False)
-    for name in namelist:
-      try:
-        self.factory.loggedin_users[name].sendLine(msg)
-      except KeyError:
-        if saveJson:
-          pool.runOperation("INSERT INTO savedmessages VALUES (E%s, E%s)", (name, msg))
+  def sendToOther(self, msg, name):
+    try:
+      self.factory.loggedin_users[name].sendLine(msg)
+    except KeyError:
+      pass
 
   def neutralLineReceived(self, line):
     print "Received query for: "+line
@@ -119,11 +114,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             msg = {}
             msg['Response Type']='Friend Request'
             msg['From User']=self.username
-            self.sendToOthers(json.dumps(msg), [o['Friend Name']], save = True)
-            #try:
-            #  self.factory.loggedin_users[o['Friend Name']].sendLine(json.dumps(msg))
-            #except:
-            #  pass
+            self.sendToOther(json.dumps(msg), o['Friend Name'])
 
           def _checkIfShouldFriend(returnList):
             #self.sendLine(str(returnList))
@@ -147,13 +138,21 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
         return "Added a friend!"
 
       def parseAcceptFriend(o):
-        if self.username != None:
-          pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s AND status='Unaccepted') OR (username=E%s AND friendname=E%s AND status='Pending')",
-          (self.username, o['Friend Name'], o['Friend Name'], self.username))
+        def _sendAcceptWithLocation(loc):
+          s = loc[0][0]
+          (lat, _, lon) = s.replace('(','').replace(')','').partition(',')
           msg = {}
           msg['Response Type']='Friend Accepted'
           msg['Friend Name']=self.username
-          self.sendToOthers(json.dumps(msg), [o['Friend Name']], save = True)
+          msg['Lat']=float(lat)
+          msg['Lon']=float(lon)
+          self.sendToOther(json.dumps(msg), o['Friend Name'])
+
+        if self.username != None:
+          pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s AND status='Unaccepted') OR (username=E%s AND friendname=E%s AND status='Pending')",
+          (self.username, o['Friend Name'], o['Friend Name'], self.username))
+          pool.runQuery("SELECT lastloc FROM users WHERE UserName=E%s", self.username).addCallback(_sendAcceptWithLocation)
+
 
         return "Accepted a friend!"
 
@@ -164,7 +163,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           msg = {}
           msg['Response Type']='Friend Removed'
           msg['Friend Name']=self.username
-          self.sendToOthers(json.dumps(msg), [o['Friend Name']], save = True)
+          self.sendToOther(json.dumps(msg), o['Friend Name'])
 
         return "Removed a friend!"
 
@@ -237,14 +236,6 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
 
         return "Updated position!"
 
-      def parseGetSaved(o):
-        if self.username != None:
-          def _sendMessages(messages):
-            for m in messages:
-              self.sendLine(m[0])
-            pool.runOperation("DELETE FROM savedmessages WHERE UserName=E%s", self.username)
-          pool.runQuery("SELECT message FROM savedmessages WHERE UserName=E%s", self.username).addCallback(_sendMessages)
-
       def parseLogin(o):
 
         def login():
@@ -285,7 +276,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin,
-      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout, 'Get Saved': parseGetSaved}
+      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):

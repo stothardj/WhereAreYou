@@ -91,6 +91,12 @@ public class FriendsList extends ListActivity {
     			} else if(msgType.equals("Friend Request")) {
 					String name = b.getString("From User");
 					m_list.add(name+"\t\t(Unaccepted)");
+    			} else if(msgType.equals("Friend Removed")) {
+    				String val = b.getString("Validation");
+    				if(val.equals("Accepted"))
+    					m_list.remove(b.getString("Friend Name"));
+    				else
+    					m_list.remove(b.getString("Friend Name\t\t("+val+")"));
     			}
     		}
     	};
@@ -168,6 +174,16 @@ public class FriendsList extends ListActivity {
 					{
 			    		e1.printStackTrace();		
 					}
+			    	Message mess = Message.obtain();
+			    	Bundle b = new Bundle();
+			    	b.putString("Message Type", "Remove Friend");
+			    	b.putString("Friend Name", name);
+			    	mess.setData(b);
+			    	try {
+						mSender.send(mess);
+					} catch (RemoteException e) {
+						e.printStackTrace();
+					}
             		Toast toast = Toast.makeText(context, "Good bye "+name, duration);
             		toast.show();
         			m_list.remove(m_list.getItem(row));
@@ -185,7 +201,9 @@ public class FriendsList extends ListActivity {
         			String name = m_list.getItem(row);
         			if(name.endsWith("\t\t(Unaccepted)"))
         			{
+        				m_list.remove(name);
         	    		name = name.substring(0, name.length() - new String("\t\t(Unaccepted)").length());
+        	    		m_list.add(name);
 				    	JSONStringer friendRequest = new JSONStringer();
 				    	try 
 				    	{
@@ -199,6 +217,17 @@ public class FriendsList extends ListActivity {
 						{
 				    		e1.printStackTrace();		
 						}
+				    	Message mess = Message.obtain();
+				    	Bundle b = new Bundle();
+				    	b.putString("Message Type", "Accept Friend");
+				    	b.putString("Friend Name", name);
+				    	mess.setData(b);
+				    	try {
+							mSender.send(mess);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+				    	
 	            		Toast toast = Toast.makeText(context, "Accepting "+name, duration);
 	            		toast.show();
         			}

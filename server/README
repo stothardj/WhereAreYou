@@ -117,7 +117,7 @@ Response Type: Friend Requested
 Fields: Friend Name, Success
 
 Response Type: Friend Accepted
-Fields: Friend Name
+Fields: Friend Name, Lat, Lon
 
 Response Type: Friend Request
 Fields: From User
