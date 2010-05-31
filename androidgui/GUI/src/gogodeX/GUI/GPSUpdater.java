@@ -164,7 +164,10 @@ public class GPSUpdater extends Service {
 				} else if(msgType.equals("Declare Active")) {
 					currentTab = b.getString("whoami");
 				} else if(msgType.equals("Accept Friend")) {
-					friends.get(b.getString("Friend Name")).setValidation("Accepted");
+					String name = b.getString("Friend Name");
+					User u = new User(name, null);
+					u.setValidation("Accepted");
+					friends.put(name, u);
 				} else if(msgType.equals("Remove Friend")) {
 					friends.remove(b.getString("Friend Name"));
 				}

@@ -151,6 +151,8 @@ public class FriendsList extends ListActivity {
     	String name = m_list.getItem(row);
     	if(name.endsWith("\t\t(Pending)"))
     		name = name.substring(0, name.length() - new String("\t\t(Pending)").length());
+    	if(name.endsWith("\t\t(Unaccepted)"))
+    		name = name.substring(0, name.length() - new String("\t\t(Unaccepted)").length());
     	((EditText)findViewById(R.id.friend_name_textbox)).setText(name);
     	
     	remove.setOnClickListener(new View.OnClickListener(){
