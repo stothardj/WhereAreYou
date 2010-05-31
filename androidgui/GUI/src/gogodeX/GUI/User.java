@@ -11,10 +11,11 @@ public class User {
 	private Location userLocation;
 	private String validation;
 	
-	public User(String uName, Location l)
+	public User(String uName, Location l, String validation)
 	{
 		setUserName(uName);
 		userLocation = l;
+		this.validation = validation;
 	}
 
 	public void setUserName(String userName) {

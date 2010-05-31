@@ -165,8 +165,7 @@ public class GPSUpdater extends Service {
 					currentTab = b.getString("whoami");
 				} else if(msgType.equals("Accept Friend")) {
 					String name = b.getString("Friend Name");
-					User u = new User(name, null);
-					u.setValidation("Accepted");
+					User u = new User(name, null, "Accepted");
 					friends.put(name, u);
 				} else if(msgType.equals("Remove Friend")) {
 					friends.remove(b.getString("Friend Name"));
@@ -233,8 +232,7 @@ public class GPSUpdater extends Service {
 							Location loc =  new Location("gps");
 							loc.setLatitude(lat);
 							loc.setLongitude(lon);
-							User user = new User(name, loc);
-							user.setValidation(status);
+							User user = new User(name, loc, status);
 							friends.put(name, user);
 						}
 					}
@@ -249,8 +247,7 @@ public class GPSUpdater extends Service {
 								mess.setData(bo);
 								messengers.get("Friends List").send(mess);
 							}
-							User u = new User(name, null);
-							u.setValidation("Pending");
+							User u = new User(name, null, "Pending");
 							friends.put(name, u);
 						}
 						else
@@ -276,7 +273,7 @@ public class GPSUpdater extends Service {
 		        		Location loc = new Location("gps");
 		        		loc.setLatitude(jo.getDouble("Lat"));
 		        		loc.setLongitude(jo.getDouble("Lon"));
-		        		User u = new User(name, loc);
+		        		User u = new User(name, loc, "Accepted");
 		        		friends.put(name, u);
 						
 		        		if(messengers.containsKey("Friends List")) {
@@ -306,8 +303,7 @@ public class GPSUpdater extends Service {
 		        			messengers.get("Friends List").send(mess2);
 		        		}
 		        		
-		        		User u = new User(name, null);
-						u.setValidation("Unaccepted");
+		        		User u = new User(name, null, "Unaccepted");
 						friends.put(name, u);
 		        		
 					} else if(resT.equals("Friend Removed")) {
