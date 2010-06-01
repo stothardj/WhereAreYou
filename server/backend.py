@@ -175,12 +175,25 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               s = list[2]
               (lat, _, lon) = s.replace('(','').replace(')','').partition(',')
               return [list[0], list[1], float(lat), float(lon)]
+            def flipFriendPerspective(list):
+              #Since join has to be done from friend's perspective to get their location
+              #we need to flip the relationship status (this should be faster than two queries)
+              #Also enforces privacy
+              if list[1] == 'Unaccepted':
+                list[1] = 'Pending'
+                list[2] = 0
+                list[3] = 0
+              elif list[1] == 'Pending':
+                list[1] = 'Unaccepted'
+                list[2] = 0
+                list[3] = 0
+              return list
             msg = {}
             msg['Response Type']='Friend List'
-            msg['Friend List']=map(reformatCoord, flist)
+            msg['Friend List']=map(flipFriendPerspective, map(reformatCoord, flist))
             self.sendLine(json.dumps(msg))
 
-          pool.runQuery("SELECT FriendName, Status, lastloc FROM users INNER JOIN friends ON users.username=friends.username WHERE users.username=E%s", self.username).addCallback(_compileFriends)
+          pool.runQuery("select users.username, status, lastloc from users inner join friends on users.username=friends.username where friends.friendname=E%s", self.username).addCallback(_compileFriends)
         return "Sent back friends list!"
 
       def parseUpdateCoord(o):

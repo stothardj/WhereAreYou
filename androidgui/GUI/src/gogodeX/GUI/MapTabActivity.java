@@ -1,6 +1,7 @@
 package gogodeX.GUI;
 
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 
@@ -26,13 +27,14 @@ public class MapTabActivity extends MapActivity {
 	private static Drawable icon;
 	private static MyLocationOverlay myLocOverlay;
 	private Messenger mSender;
+	HashMap<String, Location> friendLocations;
 
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);
 	    setContentView(R.layout.maptabactivityview);
 	    
-	    icon = getResources().getDrawable(R.drawable.icon);
+	    icon = getResources().getDrawable(R.drawable.pin);
 	    
 	    // Get the current MapView
 	    mapView = (MapView) findViewById(R.id.mapview);
@@ -45,8 +47,8 @@ public class MapTabActivity extends MapActivity {
 		myLocOverlay.enableMyLocation();
 		mapView.getOverlays().add(myLocOverlay);
 		
-		createAndShowItemizedOverlay();
-
+		friendLocations = new HashMap<String, Location>();
+		
     	////////////// Setup Two Way Communication ////////////////////
     	final Handler mHandler = new Handler() {
     		@Override
@@ -58,6 +60,24 @@ public class MapTabActivity extends MapActivity {
 	        		int duration = Toast.LENGTH_SHORT;
             		Toast toast = Toast.makeText(context, b.getString("Toast Message"), duration);
             		toast.show();
+    			} else if(msgType.equals("Friend List")) {
+    				String [] farray = b.getStringArray("Friend Names");
+    				Location[] larray = (Location[]) b.getParcelableArray("Location Array");
+    				int i=0;
+    				for(String name : farray) {
+    					if(name==null) //don't add empty entries
+    						break;
+    					friendLocations.put(name, larray[i]);
+    					i++;
+    				}
+    				createAndShowItemizedOverlay();
+    			} else if(msgType.startsWith("Add Friend")) {
+    				String name = b.getString("Friend Name");
+    				Location loc = null;
+    				if(msgType.endsWith("with Position")) {
+    					loc = b.getParcelable("Location");
+    				}
+    				friendLocations.put(name, loc);
     			}
     		}
     	};
@@ -104,24 +124,23 @@ public class MapTabActivity extends MapActivity {
 		}
 	}
 	
-	protected static void createAndShowItemizedOverlay() 
+	protected void createAndShowItemizedOverlay() 
 	{
-		/*
 		List overlays = mapView.getOverlays();
  
 		// first remove old overlay
 		if (overlays.size() > 0) 
 		{
-			for (Iterator iterator = overlays.iterator(); iterator.hasNext();) 
+			for (int i = 0; i < overlays.size(); i++) 
 			{
-				if(iterator.next() != myLocOverlay)
+				if(overlays.get(i) != myLocOverlay)
 				{
-					iterator.remove();
+					overlays.remove(i);
+					break;
 				}
 			}
 		}
  
-		//Collection<User> userCollection = MessageHandler.getFriendsList().values();
 		GeoPoint geopoint = new GeoPoint(0,0);
 		icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
 		Location newLocation;
@@ -129,16 +148,19 @@ public class MapTabActivity extends MapActivity {
 		overlay = new BuddyOverlay(icon);
 		OverlayItem item;
 		
-		for(Iterator<User> userIterator = userCollection.iterator(); userIterator.hasNext();)
+		for(String name : friendLocations.keySet())
 		{
-			// transform the location to a geopoint
-			newLocation = new Location(userIterator.next().getLocation());
-			geopoint = new GeoPoint(
-					(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
-							.getLongitude() * 1E6));
-			
-			item = new OverlayItem(geopoint, "My Location", null);
-			overlay.addItem(item);
+			Location loc = friendLocations.get(name);
+			if(loc != null) {
+				// transform the location to a geopoint
+				newLocation = new Location(loc);
+				geopoint = new GeoPoint(
+						(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
+								.getLongitude() * 1E6));
+				
+				item = new OverlayItem(geopoint, "My Location", name);
+				overlay.addItem(item);
+			}
 		}
 		
 		
@@ -150,7 +172,6 @@ public class MapTabActivity extends MapActivity {
  
 		// redraw map
 		mapView.postInvalidate();
-		*/
 	}
  
     @Override

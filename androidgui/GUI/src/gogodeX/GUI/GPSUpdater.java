@@ -167,31 +167,73 @@ public class GPSUpdater extends Service {
 					String name = b.getString("Friend Name");
 					User u = new User(name, null, "Accepted");
 					friends.put(name, u);
+					
+					if(messengers.containsKey("Map")) {
+	        			Message mess2 = Message.obtain();
+	        			Bundle bo2 = new Bundle();
+	        			bo2.putString("Message Type", "Add Friend without Position");
+	        			bo2.putString("Friend Name", name);
+	        			mess2.setData(bo2);
+	        			try {
+							messengers.get("Map").send(mess2);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}
+					
 				} else if(msgType.equals("Remove Friend")) {
 					friends.remove(b.getString("Friend Name"));
 				}
 				
-				//Send full friends list to friends tab once it is created
-				if(msgType.equals("Pass Messenger") && currentTab.equals("Friends List")) {
-					Message mess = Message.obtain();
-					Bundle bo = new Bundle();
-					bo.putString("Message Type", "Friend List");
-					String[] farray = new String[friends.size()];
-					int i = 0;
-					for(String name : friends.keySet()) {
-						User u = friends.get(name);
-						String s = name;
-						if(!u.getValidation().equals("Accepted"))
-							s += "\t\t("+u.getValidation()+")";
-						farray[i] = s;
-						i++;
-					}
-					bo.putStringArray("Friend List", farray);
-					mess.setData(bo);
-					try {
-						messengers.get(currentTab).send(mess);
-					} catch (RemoteException e) {
-						e.printStackTrace();
+				//Special things to do when tabs are created (bound).
+				if(msgType.equals("Pass Messenger")) {
+					if(currentTab.equals("Friends List")) {
+						//Send friends list w/ status
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Friend List");
+						String[] farray = new String[friends.size()];
+						int i = 0;
+						for(String name : friends.keySet()) {
+							User u = friends.get(name);
+							String s = name;
+							if(!u.getValidation().equals("Accepted"))
+								s += "\t\t("+u.getValidation()+")";
+							farray[i] = s;
+							i++;
+						}
+						bo.putStringArray("Friend List", farray);
+						mess.setData(bo);
+						try {
+							messengers.get(currentTab).send(mess);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					} else if(currentTab.equals("Map")) {
+						//Send friends list of only non-null locations
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Friend List");
+						String[] farray = new String[friends.size()];
+						Location[] larray = new Location[friends.size()];
+						int i=0;
+						for(String name : friends.keySet()) {
+							User u = friends.get(name);
+							Location loc = u.getLocation();
+							if(loc!=null) {
+								farray[i] = name;
+								larray[i] = loc;
+								i++;
+							}
+						}
+						bo.putStringArray("Friend Names", farray);
+						bo.putParcelableArray("Location Array", larray);
+						mess.setData(bo);
+						try {
+							messengers.get(currentTab).send(mess);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
 					}
 				}
 				
@@ -227,11 +269,14 @@ public class GPSUpdater extends Service {
 							JSONArray friend = flist.getJSONArray(i);
 							String name = friend.getString(0);
 							String status = friend.getString(1);
-							double lat = friend.getDouble(2);
-							double lon = friend.getDouble(3);
-							Location loc =  new Location("gps");
-							loc.setLatitude(lat);
-							loc.setLongitude(lon);
+							Location loc = null;
+							if(status.equals("Accepted")) {
+								double lat = friend.getDouble(2);
+								double lon = friend.getDouble(3);
+								loc =  new Location("gps");
+								loc.setLatitude(lat);
+								loc.setLongitude(lon);
+							}
 							User user = new User(name, loc, status);
 							friends.put(name, user);
 						}
@@ -284,6 +329,15 @@ public class GPSUpdater extends Service {
 			        		mess2.setData(bo2);
 			        		messengers.get("Friends List").send(mess2);
 		        		}
+		        		if(messengers.containsKey("Map")) {
+		        			Message mess2 = Message.obtain();
+		        			Bundle bo2 = new Bundle();
+		        			bo2.putString("Message Type", "Add Friend with Position");
+		        			bo2.putString("Friend Name", name);
+		        			bo2.putParcelable("Location", loc);
+		        			mess2.setData(bo2);
+		        			messengers.get("Map").send(mess2);
+		        		}
 					} else if(resT.equals("Friend Request"))
 					{
 						String name = jo.getString("From User");
@@ -321,6 +375,14 @@ public class GPSUpdater extends Service {
 						}
 						
 						friends.remove(jo.getString("Friend Name"));
+					} else if(resT.equals("Position Update")) {
+						String name = jo.getString("User Name");
+						double lat = jo.getDouble("Lat");
+						double lon = jo.getDouble("Lon");
+						Location loc = new Location("gps");
+						loc.setLatitude(lat);
+						loc.setLongitude(lon);
+						friends.get(name).setLocation(loc);
 					}
 				} catch(JSONException e) {
 					e.printStackTrace();
