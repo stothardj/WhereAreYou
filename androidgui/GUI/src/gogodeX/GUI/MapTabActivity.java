@@ -144,34 +144,31 @@ public class MapTabActivity extends MapActivity {
 		GeoPoint geopoint = new GeoPoint(0,0);
 		icon.setBounds(0, 0, icon.getIntrinsicWidth(), icon.getIntrinsicHeight());
 		Location newLocation;
-		BuddyOverlay overlay;
-		overlay = new BuddyOverlay(icon);
-		OverlayItem item;
 		
-		for(String name : friendLocations.keySet())
-		{
-			Location loc = friendLocations.get(name);
-			if(loc != null) {
-				// transform the location to a geopoint
-				newLocation = new Location(loc);
-				geopoint = new GeoPoint(
-						(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
-								.getLongitude() * 1E6));
-				
-				item = new OverlayItem(geopoint, "My Location", name);
-				overlay.addItem(item);
+		if(!friendLocations.isEmpty()) {
+			BuddyOverlay overlay;
+			overlay = new BuddyOverlay(icon);
+			OverlayItem item;
+			for(String name : friendLocations.keySet())
+			{
+				Location loc = friendLocations.get(name);
+				if(loc != null) {
+					// transform the location to a geopoint
+					newLocation = new Location(loc);
+					geopoint = new GeoPoint(
+							(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
+									.getLongitude() * 1E6));
+					
+					item = new OverlayItem(geopoint, "My Location", name);
+					overlay.addItem(item);
+				}
 			}
+			mapView.getOverlays().add(overlay);
+			// move to location
+			mapView.getController().animateTo(geopoint); 
+			// redraw map
+			mapView.postInvalidate();
 		}
-		
-		
-		mapView.getOverlays().add(overlay);
-
- 
-		// move to location
-		mapView.getController().animateTo(geopoint);
- 
-		// redraw map
-		mapView.postInvalidate();
 	}
  
     @Override
