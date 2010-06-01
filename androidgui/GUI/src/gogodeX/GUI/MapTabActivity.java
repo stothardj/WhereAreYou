@@ -78,6 +78,17 @@ public class MapTabActivity extends MapActivity {
     					loc = b.getParcelable("Location");
     				}
     				friendLocations.put(name, loc);
+    				if(loc!=null)
+    					createAndShowItemizedOverlay();
+    			} else if(msgType.equals("Remove Friend")) {
+					String name = b.getString("Friend Name");
+					friendLocations.remove(name);
+					createAndShowItemizedOverlay();
+    			} else if(msgType.equals("Update Position")) {		
+					String name = b.getString("Friend Name");
+					Location loc = b.getParcelable("Location");
+					friendLocations.put(name, loc);
+					createAndShowItemizedOverlay();
     			}
     		}
     	};

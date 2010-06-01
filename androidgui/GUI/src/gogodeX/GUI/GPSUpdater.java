@@ -182,7 +182,22 @@ public class GPSUpdater extends Service {
 					}
 					
 				} else if(msgType.equals("Remove Friend")) {
-					friends.remove(b.getString("Friend Name"));
+					String name = b.getString("Friend Name");
+					String val = friends.get(name).getValidation();
+					friends.remove(name);
+					
+					if(val.equals("Accepted") && messengers.containsKey("Map")) {
+						Message mess2 = Message.obtain();
+						Bundle bo2 = new Bundle();
+						bo2.putString("Message Type", "Remove Friend");
+						bo2.putString("Friend Name", name);
+						mess2.setData(bo2);
+						try {
+							messengers.get("Map").send(mess2);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 				
 				//Special things to do when tabs are created (bound).
@@ -362,16 +377,25 @@ public class GPSUpdater extends Service {
 		        		
 					} else if(resT.equals("Friend Removed")) {
 
+						String name = jo.getString("Friend Name");
+	        			String val = friends.get(name).getValidation();
+	        			
 						if(messengers.containsKey("Friends List")) {
 		        			Message mess2 = Message.obtain();
 		        			Bundle bo2 = new Bundle();
 		        			bo2.putString("Message Type", "Friend Removed");
-		        			String name = jo.getString("Friend Name");
-		        			String val = friends.get(name).getValidation();
 		        			bo2.putString("Friend Name", name);
 		        			bo2.putString("Validation", val);
 		        			mess2.setData(bo2);
-		        			messengers.get("Friends List").send(mess2);							
+		        			messengers.get("Friends List").send(mess2);
+						}
+						if(val.equals("Accepted") && messengers.containsKey("Map")) {
+							Message mess2 = Message.obtain();
+							Bundle bo2 = new Bundle();
+							bo2.putString("Message Type", "Remove Friend");
+							bo2.putString("Friend Name", name);
+							mess2.setData(bo2);
+							messengers.get("Map").send(mess2);
 						}
 						
 						friends.remove(jo.getString("Friend Name"));
@@ -383,6 +407,16 @@ public class GPSUpdater extends Service {
 						loc.setLatitude(lat);
 						loc.setLongitude(lon);
 						friends.get(name).setLocation(loc);
+						
+						if(messengers.containsKey("Map")) {
+							Message mess2 = Message.obtain();
+							Bundle bo2 = new Bundle();
+							bo2.putString("Message Type", "Update Position");
+							bo2.putString("Friend Name", name);
+							bo2.putParcelable("Location", loc);
+							mess2.setData(bo2);
+							messengers.get("Map").send(mess2);
+						}
 					}
 				} catch(JSONException e) {
 					e.printStackTrace();
