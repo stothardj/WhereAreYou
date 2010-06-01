@@ -158,7 +158,7 @@ public class MapTabActivity extends MapActivity {
 		
 		if(!friendLocations.isEmpty()) {
 			BuddyOverlay overlay;
-			overlay = new BuddyOverlay(icon);
+			overlay = new BuddyOverlay(icon, getApplicationContext());
 			OverlayItem item;
 			for(String name : friendLocations.keySet())
 			{
@@ -170,7 +170,7 @@ public class MapTabActivity extends MapActivity {
 							(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
 									.getLongitude() * 1E6));
 					
-					item = new OverlayItem(geopoint, "My Location", name);
+					item = new OverlayItem(geopoint, name, "Zone will go here");
 					overlay.addItem(item);
 				}
 			}
