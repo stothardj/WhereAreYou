@@ -31,16 +31,12 @@
 	          <action android:name="android.intent.action.MAIN"></action>
 			</intent-filter>
     	</activity>
-    	
-    	<service android:name="gogodeX.GUI.GPSUpdater">
-
-    	</service>
-    	
-        <activity android:name="SettingsTabActivity" android:label="@string/settingActivity_name">
-	       <intent-filter>
+    	<service android:name="gogodeX.GUI.GPSUpdater" />
+    	<activity android:name="ZonesTabActivity" android:label="@string/zonesActivity">
+			<intent-filter>
 	          <category android:name="android.intent.category.EMBED"></category>
 	          <action android:name="android.intent.action.MAIN"></action>
-	       </intent-filter>
+			</intent-filter>
     	</activity>
         <activity android:name="Tabs" android:label="@string/tabs_name">
 	       <intent-filter>

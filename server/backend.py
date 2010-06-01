@@ -196,6 +196,14 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           pool.runQuery("select users.username, status, lastloc from users inner join friends on users.username=friends.username where friends.friendname=E%s", self.username).addCallback(_compileFriends)
         return "Sent back friends list!"
 
+      def parseRefreshZones(o):
+        if self.username != None:
+          def _sendZones(zonelist):
+            msg = {}
+            msg['Response Type']='Zone List'
+            msg['Zone List']=zonelist
+            self.sendLine(json.dumps(msg))
+          pool.runQuery("select zonename, action, text from zonenames where username=E%s", self.username).addCallback(_sendZones)
       def parseUpdateCoord(o):
         if self.username != None:
 
@@ -289,7 +297,8 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       'Add Zone': parseAddZone, 'Remove Zone': parseRemoveZone, 'Add Friend':
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin,
-      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout}
+      'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout, 'Refresh Zones':
+      parseRefreshZones}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):

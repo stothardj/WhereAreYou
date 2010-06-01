@@ -1,7 +1,6 @@
 package gogodeX.GUI;
 
 import org.json.JSONException;
-import org.json.JSONObject;
 import org.json.JSONStringer;
 import android.app.ListActivity;
 import android.content.ComponentName;
@@ -24,7 +23,6 @@ import android.widget.EditText;
 public class FriendsList extends ListActivity {
 	private ArrayAdapter<String> m_list;
 	int row = -1;
-	private FriendsList ref = this;
 	private Messenger mSender = null;
 	
 	@Override

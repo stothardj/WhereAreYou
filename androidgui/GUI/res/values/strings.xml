@@ -4,6 +4,7 @@
     <string name="mapActivity_name">Map Activity</string>
     <string name="friendslist_name">Map Actvitity</string>
     <string name="settingActivity_name">Map Activity</string>
+    <string name="zonesActivity">Zones Activity</string>
     <string name="tabs_name">Tabs</string>
 	<string name="createaccount_name">Createaccnt</string>
     <string name="createActivity_name">Create Activity</string>
@@ -28,6 +29,16 @@
     <string name="remove_friend_button">Remove Friend</string>
     <string name="accept_friend_button">Accept Friend</string>
     <string name="friend_name_prompt">Friend Name</string>
+    
+    <!-- Zones -->
+    <string name="zone_name_label">Zone Name</string>
+    <string name="zone_radius_label">Zone Radius</string>
+    <string name="zone_privacy_label">Zone Privacy</string>
+    <string name="show_gps">Show GPS</string>
+    <string name="show_text">Show Text</string>
+    <string name="hide">Hide</string>
+    <string name="add_zone">Add Zone</string>
+    <string name="remove_zone">Remove Zone</string>
     
 <string name="title_polling">Polling Frequency</string>
 <string name="summary_polling">Select your desired polling frequency.</string>
