@@ -7,7 +7,7 @@
 		android:id="@+id/friend_name_textbox"
 		android:layout_width="fill_parent"
 		android:layout_height="wrap_content"
-		android:text="@string/friend_name_prompt"
+		android:hint="@string/friend_name_prompt"
 	/>
 	<Button
 		android:id="@+id/add_friend"
