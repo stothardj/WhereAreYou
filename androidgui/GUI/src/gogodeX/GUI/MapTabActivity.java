@@ -29,6 +29,9 @@ public class MapTabActivity extends MapActivity {
 	private Messenger mSender;
 	HashMap<String, Location> friendLocations;
 
+	// Override the back button behavior, we don't want this to do anything
+    public void onBackPressed  (){}		
+	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 	    super.onCreate(savedInstanceState);

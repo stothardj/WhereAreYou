@@ -28,6 +28,9 @@ public class ZonesTabActivity extends ListActivity {
 	private Messenger mSender;
 	private double mLat, mLon;
 	private String mZoneName;
+
+	// Override the back button behavior, we don't want this to do anything
+    public void onBackPressed  (){}		
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {

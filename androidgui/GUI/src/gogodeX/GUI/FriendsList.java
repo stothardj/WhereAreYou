@@ -24,6 +24,9 @@ public class FriendsList extends ListActivity {
 	private ArrayAdapter<String> m_list;
 	int row = -1;
 	private Messenger mSender = null;
+
+	// Override the back button behavior, we don't want this to do anything
+    public void onBackPressed  (){}		
 	
 	@Override
 	public void onCreate(Bundle savedInstanceState) {		

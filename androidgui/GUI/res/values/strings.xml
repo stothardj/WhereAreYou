@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">GUI</string>
+    <string name="app_name">gogodeX</string>
     <string name="mapActivity_name">Map Activity</string>
     <string name="friendslist_name">Map Actvitity</string>
     <string name="settingActivity_name">Map Activity</string>

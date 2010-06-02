@@ -31,7 +31,8 @@ public class Tabs extends TabActivity {
         intent = new Intent().setClass(this.getApplicationContext(), MapTabActivity.class);
 
         // Initialize a TabSpec for each tab and add it to the TabHost
-        spec = tabHost.newTabSpec("map").setIndicator("map")
+        spec = tabHost.newTabSpec("map").setIndicator("Map",
+                getResources().getDrawable(R.drawable.mapicon))
                       .setContent(intent);
         tabHost.addTab(spec);
 
@@ -42,11 +43,13 @@ public class Tabs extends TabActivity {
                       .setContent(intent);
         */
         intent = new Intent().setClass(this.getApplicationContext(), ZonesTabActivity.class);
-        spec = tabHost.newTabSpec("zones").setIndicator("zones").setContent(intent);
+        spec = tabHost.newTabSpec("zones").setIndicator("Zones",
+                getResources().getDrawable(R.drawable.zoneicon)).setContent(intent);
         tabHost.addTab(spec);
         
         intent = new Intent().setClass(this.getApplicationContext(), FriendsList.class);
-        spec = tabHost.newTabSpec("friends list").setIndicator("friends list")
+        spec = tabHost.newTabSpec("friends list").setIndicator("Friends List",
+                getResources().getDrawable(R.drawable.friendicon))
         			  .setContent(intent);
         tabHost.addTab(spec);
         
