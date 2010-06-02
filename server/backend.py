@@ -163,6 +163,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           msg['Lat']=float(lat)
           msg['Lon']=float(lon)
           self.sendToOther(json.dumps(msg), o['Friend Name'])
+          parseRequestPosition(o)
 
         if self.username != None:
           pool.runOperation("UPDATE friends SET status='Accepted' WHERE (username=E%s AND friendname=E%s AND status='Unaccepted') OR (username=E%s AND friendname=E%s AND status='Pending')",
@@ -266,6 +267,43 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             self.sendLine(json.dumps(msg))
           pool.runQuery("select zonename, action, text, zone from zonenames where username=E%s", self.username).addCallback(_sendZones)
 
+      def parseRequestPosition(o): #This is called by accept friend, so does not check accepted status. If this were to be made stand-alone that should be changed
+        if self.username != None:
+          msg = {}
+          msg['Response Type']='Position Update'
+          msg['User Name']=o['Friend Name']
+          def _checkPrivacy(zone):
+            try:
+              text = zone[0][0]
+              action = zone[0][1]
+            except:
+              text = ""
+              #TODO: Have master setting in users table
+              action = "SHOWGPS"
+            if action != 'HIDE':
+              msg['Action'] = action
+              msg['Text'] = text
+              self.sendLine(json.dumps(msg))
+
+          def _confirmFriendship(returnList):
+            [(_, friendShip), (_, location)] = returnList
+            if friendShip != []: #If i am actually their friend
+              (lat, _, lon) = location[0][0].replace('(','').replace(')','').partition(',')
+              lat = float(lat)
+              lon = float(lon)
+              msg['Lat'] = lat
+              msg['Lon'] = lon
+              pool.runQuery("SELECT zonename, action FROM zonenames WHERE UserName=E%s AND point(%f, %f) <@ zone LIMIT 1", (o['Friend Name'], lat, lon)).addCallback(_checkPrivacy)
+
+          print "User name is "+self.username
+          print "Friend name is"+o['Friend Name']
+          d1 = pool.runQuery("select friendname from friends where username=E%s and friendname=E%s limit 1", (self.username, o['Friend Name']))
+          d2 = pool.runQuery("select lastloc from users where username=E%s limit 1", o['Friend Name'])
+          d = defer.DeferredList([d1, d2])
+          print "Adding callback"
+          d.addCallback(_confirmFriendship)
+          return "Requested Position!"
+
       def parseUpdateCoord(o):
         if self.username != None:
 
@@ -314,8 +352,6 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
               pool.runQuery("SELECT FriendName FROM friends WHERE UserName=E%s AND Status='Accepted'", self.username).addCallback(_pushPosition, action, o['Lat'], o['Lon'], text)
 
           pool.runQuery("SELECT zonename, action FROM zonenames WHERE UserName=E%s AND point(%f, %f) <@ zone LIMIT 1", (self.username, o['Lat'], o['Lon'])).addCallback(_checkPrivacy)
-
-
 
         return "Updated position!"
 
