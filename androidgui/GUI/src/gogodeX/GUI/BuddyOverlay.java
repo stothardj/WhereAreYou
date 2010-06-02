@@ -39,8 +39,13 @@ public class BuddyOverlay extends ItemizedOverlay {
 	
 	@Override
 	protected boolean onTap(int pIndex) {
-	   Toast.makeText(mContext, items.get(pIndex).getTitle() + "\n" + items.get(pIndex).getSnippet(),Toast.LENGTH_SHORT).show();
-	   return true;
+		String snippet = items.get(pIndex).getSnippet();
+		if(snippet.equals("")) {
+			Toast.makeText(mContext, items.get(pIndex).getTitle(),Toast.LENGTH_SHORT).show();
+		} else {
+			Toast.makeText(mContext, items.get(pIndex).getTitle() + "\n" + snippet,Toast.LENGTH_SHORT).show();
+		}
+		return true;
 	   
 	}
  

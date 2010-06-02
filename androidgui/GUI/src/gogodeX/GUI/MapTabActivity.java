@@ -27,7 +27,17 @@ public class MapTabActivity extends MapActivity {
 	private static Drawable icon;
 	private static MyLocationOverlay myLocOverlay;
 	private Messenger mSender;
-	HashMap<String, Location> friendLocations;
+	
+	private class FriendLocation { //bag o' data
+		public FriendLocation(Location location, String zoneText) { //convenience constructor
+			this.location = location;
+			this.zoneText = zoneText;
+		}
+		Location location;
+		String zoneText;
+	}
+	
+	HashMap<String, FriendLocation> friendLocations;
 
 	// Override the back button behavior, we don't want this to do anything
     public void onBackPressed  (){}		
@@ -50,7 +60,7 @@ public class MapTabActivity extends MapActivity {
 		myLocOverlay.enableMyLocation();
 		mapView.getOverlays().add(myLocOverlay);
 		
-		friendLocations = new HashMap<String, Location>();
+		friendLocations = new HashMap<String, FriendLocation>();
 		
     	////////////// Setup Two Way Communication ////////////////////
     	final Handler mHandler = new Handler() {
@@ -70,7 +80,7 @@ public class MapTabActivity extends MapActivity {
     				for(String name : farray) {
     					if(name==null) //don't add empty entries
     						break;
-    					friendLocations.put(name, larray[i]);
+    					friendLocations.put(name, new FriendLocation(larray[i], null));
     					i++;
     				}
     				createAndShowItemizedOverlay();
@@ -80,7 +90,7 @@ public class MapTabActivity extends MapActivity {
     				if(msgType.endsWith("with Position")) {
     					loc = b.getParcelable("Location");
     				}
-    				friendLocations.put(name, loc);
+    				friendLocations.put(name, new FriendLocation(loc, null));
     				if(loc!=null)
     					createAndShowItemizedOverlay();
     			} else if(msgType.equals("Remove Friend")) {
@@ -90,7 +100,8 @@ public class MapTabActivity extends MapActivity {
     			} else if(msgType.equals("Update Position")) {		
 					String name = b.getString("Friend Name");
 					Location loc = b.getParcelable("Location");
-					friendLocations.put(name, loc);
+					String zoneText = b.getString("Zone Text");
+					friendLocations.put(name, new FriendLocation(loc, zoneText));
 					createAndShowItemizedOverlay();
     			}
     		}
@@ -165,7 +176,11 @@ public class MapTabActivity extends MapActivity {
 			OverlayItem item;
 			for(String name : friendLocations.keySet())
 			{
-				Location loc = friendLocations.get(name);
+				FriendLocation floc = friendLocations.get(name);
+				Location loc = floc.location;
+				String zoneText = "";
+				if(floc.zoneText != null)
+					zoneText = floc.zoneText;
 				if(loc != null) {
 					// transform the location to a geopoint
 					newLocation = new Location(loc);
@@ -173,7 +188,7 @@ public class MapTabActivity extends MapActivity {
 							(int) (newLocation.getLatitude() * 1E6), (int) (newLocation
 									.getLongitude() * 1E6));
 					
-					item = new OverlayItem(geopoint, name, "Zone will go here");
+					item = new OverlayItem(geopoint, name, zoneText);
 					overlay.addItem(item);
 				}
 			}

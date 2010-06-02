@@ -10,6 +10,7 @@ public class User {
 	private String userName;
 	private Location userLocation;
 	private String validation;
+	private String zoneText;
 	
 	public User(String uName, Location l, String validation)
 	{
@@ -49,6 +50,13 @@ public class User {
 	public void setLocation(Location l)
 	{
 		userLocation = l;
+	}
+	
+	public void setZoneText(String zoneText) {
+		this.zoneText = zoneText;
+	}
+	public String getZoneText(String zoneText) {
+		return zoneText;
 	}
 
 }

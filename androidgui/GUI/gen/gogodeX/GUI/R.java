@@ -9,8 +9,8 @@ package gogodeX.GUI;
 
 public final class R {
     public static final class array {
-        public static final int entries_polling=0x7f050000;
-        public static final int entryvalues_polling=0x7f050001;
+        public static final int entries_polling=0x7f040000;
+        public static final int entryvalues_polling=0x7f040001;
     }
     public static final class attr {
     }
@@ -29,38 +29,38 @@ public final class R {
         public static final int zoneoff=0x7f02000b;
     }
     public static final class id {
-        public static final int Back=0x7f07000b;
-        public static final int Firstname=0x7f070007;
-        public static final int Lastname=0x7f070009;
-        public static final int accept_friend=0x7f07000f;
-        public static final int add_friend=0x7f07000d;
-        public static final int add_zone=0x7f07001d;
-        public static final int create=0x7f07000a;
-        public static final int first_label=0x7f070006;
-        public static final int friend_name_textbox=0x7f07000c;
-        public static final int gogologo=0x7f070011;
-        public static final int hide=0x7f07001c;
-        public static final int last_label=0x7f070008;
-        public static final int mapview=0x7f070013;
-        public static final int name=0x7f070010;
-        public static final int ok=0x7f070012;
-        public static final int password=0x7f070003;
-        public static final int password2=0x7f070005;
-        public static final int password_label=0x7f070002;
-        public static final int password_label2=0x7f070004;
-        public static final int remove_friend=0x7f07000e;
-        public static final int remove_zone=0x7f07001e;
-        public static final int show_gps=0x7f07001a;
-        public static final int show_text=0x7f07001b;
-        public static final int username=0x7f070001;
-        public static final int username_label=0x7f070000;
-        public static final int zone_name_label=0x7f070014;
-        public static final int zone_name_privacy=0x7f070019;
-        public static final int zone_name_text=0x7f070015;
-        public static final int zone_privacy_label=0x7f070018;
-        public static final int zone_radius_label=0x7f070016;
-        public static final int zone_radius_text=0x7f070017;
-        public static final int zone_row=0x7f07001f;
+        public static final int Back=0x7f06000b;
+        public static final int Firstname=0x7f060007;
+        public static final int Lastname=0x7f060009;
+        public static final int accept_friend=0x7f06000f;
+        public static final int add_friend=0x7f06000d;
+        public static final int add_zone=0x7f06001d;
+        public static final int create=0x7f06000a;
+        public static final int first_label=0x7f060006;
+        public static final int friend_name_textbox=0x7f06000c;
+        public static final int gogologo=0x7f060011;
+        public static final int hide=0x7f06001c;
+        public static final int last_label=0x7f060008;
+        public static final int mapview=0x7f060013;
+        public static final int name=0x7f060010;
+        public static final int ok=0x7f060012;
+        public static final int password=0x7f060003;
+        public static final int password2=0x7f060005;
+        public static final int password_label=0x7f060002;
+        public static final int password_label2=0x7f060004;
+        public static final int remove_friend=0x7f06000e;
+        public static final int remove_zone=0x7f06001e;
+        public static final int show_gps=0x7f06001a;
+        public static final int show_text=0x7f06001b;
+        public static final int username=0x7f060001;
+        public static final int username_label=0x7f060000;
+        public static final int zone_name_label=0x7f060014;
+        public static final int zone_name_privacy=0x7f060019;
+        public static final int zone_name_text=0x7f060015;
+        public static final int zone_privacy_label=0x7f060018;
+        public static final int zone_radius_label=0x7f060016;
+        public static final int zone_radius_text=0x7f060017;
+        public static final int zone_row=0x7f06001f;
     }
     public static final class layout {
         public static final int createaccount=0x7f030000;
@@ -74,49 +74,46 @@ public final class R {
         public static final int zones_rows=0x7f030008;
     }
     public static final class string {
-        public static final int accept_friend_button=0x7f060017;
+        public static final int accept_friend_button=0x7f050017;
         /**  Friends list 
          */
-        public static final int add_friend_button=0x7f060015;
-        public static final int add_zone=0x7f06001f;
-        public static final int app_name=0x7f060000;
-        public static final int createActivity_name=0x7f060007;
-        public static final int create_button=0x7f060010;
-        public static final int create_button2=0x7f060011;
-        public static final int create_button3=0x7f060012;
-        public static final int createaccount_name=0x7f060006;
-        public static final int default_radius=0x7f060022;
-        public static final int despassword_prompt=0x7f06000e;
-        public static final int despassword_prompt2=0x7f06000f;
-        public static final int desusername_prompt=0x7f06000d;
-        public static final int example_zone=0x7f060021;
-        public static final int first_prompt=0x7f06000a;
-        public static final int friend_name_prompt=0x7f060018;
-        public static final int friendslist_name=0x7f060002;
-        public static final int hide=0x7f06001e;
-        public static final int last_prompt=0x7f06000b;
-        public static final int login_button=0x7f06000c;
-        public static final int mapActivity_name=0x7f060001;
-        public static final int password_prompt=0x7f060009;
-        public static final int remove_friend_button=0x7f060016;
-        public static final int remove_zone=0x7f060020;
-        public static final int settingActivity_name=0x7f060003;
-        public static final int show_gps=0x7f06001c;
-        public static final int show_text=0x7f06001d;
-        public static final int summary_polling=0x7f060024;
-        public static final int summary_show_hide_toggle=0x7f060014;
-        public static final int tabs_name=0x7f060005;
-        public static final int title_polling=0x7f060023;
-        public static final int title_show_hide_toggle=0x7f060013;
-        public static final int username_prompt=0x7f060008;
+        public static final int add_friend_button=0x7f050015;
+        public static final int add_zone=0x7f05001f;
+        public static final int app_name=0x7f050000;
+        public static final int createActivity_name=0x7f050007;
+        public static final int create_button=0x7f050010;
+        public static final int create_button2=0x7f050011;
+        public static final int create_button3=0x7f050012;
+        public static final int createaccount_name=0x7f050006;
+        public static final int default_radius=0x7f050022;
+        public static final int despassword_prompt=0x7f05000e;
+        public static final int despassword_prompt2=0x7f05000f;
+        public static final int desusername_prompt=0x7f05000d;
+        public static final int example_zone=0x7f050021;
+        public static final int first_prompt=0x7f05000a;
+        public static final int friend_name_prompt=0x7f050018;
+        public static final int friendslist_name=0x7f050002;
+        public static final int hide=0x7f05001e;
+        public static final int last_prompt=0x7f05000b;
+        public static final int login_button=0x7f05000c;
+        public static final int mapActivity_name=0x7f050001;
+        public static final int password_prompt=0x7f050009;
+        public static final int remove_friend_button=0x7f050016;
+        public static final int remove_zone=0x7f050020;
+        public static final int settingActivity_name=0x7f050003;
+        public static final int show_gps=0x7f05001c;
+        public static final int show_text=0x7f05001d;
+        public static final int summary_polling=0x7f050024;
+        public static final int summary_show_hide_toggle=0x7f050014;
+        public static final int tabs_name=0x7f050005;
+        public static final int title_polling=0x7f050023;
+        public static final int title_show_hide_toggle=0x7f050013;
+        public static final int username_prompt=0x7f050008;
         /**  Zones 
          */
-        public static final int zone_name_label=0x7f060019;
-        public static final int zone_privacy_label=0x7f06001b;
-        public static final int zone_radius_label=0x7f06001a;
-        public static final int zonesActivity=0x7f060004;
-    }
-    public static final class xml {
-        public static final int settings=0x7f040000;
+        public static final int zone_name_label=0x7f050019;
+        public static final int zone_privacy_label=0x7f05001b;
+        public static final int zone_radius_label=0x7f05001a;
+        public static final int zonesActivity=0x7f050004;
     }
 }
