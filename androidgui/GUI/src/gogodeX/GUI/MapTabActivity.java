@@ -99,9 +99,15 @@ public class MapTabActivity extends MapActivity {
 					createAndShowItemizedOverlay();
     			} else if(msgType.equals("Update Position")) {		
 					String name = b.getString("Friend Name");
-					Location loc = b.getParcelable("Location");
+					String action = b.getString("Zone Action");
 					String zoneText = b.getString("Zone Text");
-					friendLocations.put(name, new FriendLocation(loc, zoneText));
+					if(action.equals("SHOWGPS")) {
+						Location loc = b.getParcelable("Location");
+						friendLocations.put(name, new FriendLocation(loc, zoneText));
+					} else {
+						//Just don't move them
+						friendLocations.put(name, new FriendLocation(friendLocations.get(name).location, zoneText));
+					}
 					createAndShowItemizedOverlay();
     			}
     		}

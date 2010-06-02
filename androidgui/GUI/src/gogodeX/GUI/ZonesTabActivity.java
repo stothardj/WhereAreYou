@@ -49,7 +49,7 @@ public class ZonesTabActivity extends ListActivity {
 				String name = ((EditText) findViewById(R.id.zone_name_text)).getText().toString();
 				double mileRadius = Double.parseDouble(((EditText) findViewById(R.id.zone_radius_text)).getText().toString());
 				if(mileRadius > 0) {
-										
+
 					//Approximate, does not account for earth curvature
 					final double degPerMile = .0144569;
 					RadioGroup r = ((RadioGroup) findViewById(R.id.zone_name_privacy));

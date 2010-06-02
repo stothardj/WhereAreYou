@@ -485,12 +485,16 @@ public class GPSUpdater extends Service {
 						friends.remove(jo.getString("Friend Name"));
 					} else if(resT.equals("Position Update")) {
 						String name = jo.getString("User Name");
-						double lat = jo.getDouble("Lat");
-						double lon = jo.getDouble("Lon");
-						Location loc = new Location("gps");
-						loc.setLatitude(lat);
-						loc.setLongitude(lon);
-						friends.get(name).setLocation(loc);
+						Location loc = null;
+						String action = jo.getString("action");
+						if(action.equals("SHOWGPS")) {
+							double lat = jo.getDouble("Lat");
+							double lon = jo.getDouble("Lon");
+							loc = new Location("gps");
+							loc.setLatitude(lat);
+							loc.setLongitude(lon);
+							friends.get(name).setLocation(loc);
+						}
 						friends.get(name).setZoneText(jo.getString("Text"));
 						
 						if(messengers.containsKey("Map")) {
@@ -498,8 +502,10 @@ public class GPSUpdater extends Service {
 							Bundle bo2 = new Bundle();
 							bo2.putString("Message Type", "Update Position");
 							bo2.putString("Friend Name", name);
-							bo2.putParcelable("Location", loc);
+							if(action.equals("SHOWGPS"))
+								bo2.putParcelable("Location", loc);
 							bo2.putString("Zone Text", jo.getString("Text"));
+							bo2.putString("Zone Action", action);
 							mess2.setData(bo2);
 							messengers.get("Map").send(mess2);
 						}

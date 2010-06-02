@@ -269,7 +269,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseUpdateCoord(o):
         if self.username != None:
 
-          pool.runOperation("UPDATE users SET lastloc=point(%f, %f) WHERE UserName=E%s",
+          pool.runOperation("UPDATE users SET lastloc=point '(%f, %f)' WHERE UserName=E%s",
           (o['Lat'], o['Lon'], self.username))
 
           def _pushPosition(friends, action, lat, lon, text):
@@ -303,7 +303,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
             '''
 
             try:
-              text = zone[0][1]
+              text = zone[0][0]
               action = zone[0][1]
             except:
               text = ""
