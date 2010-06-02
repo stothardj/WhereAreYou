@@ -12,6 +12,7 @@
         android:id="@+id/zone_name_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
+        android:hint="@string/example_zone"
         android:layout_below="@id/zone_name_label"/>
     <TextView
         android:id="@+id/zone_radius_label"
@@ -23,7 +24,8 @@
         android:id="@+id/zone_radius_text"
         android:layout_width="fill_parent"
         android:layout_height="wrap_content"
-        android:layout_below="@id/zone_radius_label"/>
+        android:text="@string/default_radius"
+        android:layout_below="@id/zone_radius_label" />
     <TextView
         android:id="@+id/zone_privacy_label"
         android:layout_width="fill_parent"

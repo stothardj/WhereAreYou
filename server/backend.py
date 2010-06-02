@@ -93,9 +93,25 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseAddZone(o):
         #TO DO: Check for overlapping zones and fail if zones overlap.
         if self.username != None:
-          #To RRR: the radius needs to be converted from user units (feet, miles etc.) to GPS. Sigh.
-          pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, circle '(( %f, %f ), %f)', E%s, E%s)",
-          (self.username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius'], o['Action'], o['Text']))
+          def _addZoneIfUnique(zonesExisting):
+            msg = {}
+            msg['Response Type']='Zone Added'
+            msg['Zone Name']=o['Zone Name']
+            msg['Lat']=o['Lat']
+            msg['Lon']=o['Lon']
+            msg['Radius']=o['Radius']
+            msg['Action']=o['Action']
+            msg['Text']=o['Text']
+            if zonesExisting == []:
+              pool.runOperation("INSERT INTO zonenames VALUES (E%s, E%s, circle '(( %f, %f ), %f)', E%s, E%s)",
+              (self.username, o['Zone Name'], o['Lat'], o['Lon'], o['Radius'], o['Action'], o['Text']))
+              msg['Success']=True
+              self.sendLine(json.dumps(msg))
+            else:
+              msg['Success']=False
+              self.sendLine(json.dumps(msg))
+
+          pool.runQuery("SELECT zonename FROM zonenames WHERE username=E%s AND zonename=E%s LIMIT 1", (self.username, o['Zone Name'])).addCallback(_addZoneIfUnique)
 
         return "Added a zone!"
 
@@ -170,7 +186,6 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       def parseRefreshFriends(o):
         if self.username != None:
           def _compileFriends(flist):
-            #Separate friend name and status by comma. Separate each entry by period
             def reformatCoord(list):
               s = list[2]
               (lat, _, lon) = s.replace('(','').replace(')','').partition(',')
@@ -196,14 +211,61 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
           pool.runQuery("select users.username, status, lastloc from users inner join friends on users.username=friends.username where friends.friendname=E%s", self.username).addCallback(_compileFriends)
         return "Sent back friends list!"
 
+      def parseRefresh(o):
+        if self.username != None:
+          def _sendFriendsAndZones(returnList):
+            [(_, flist), (_, zonelist)] = returnList
+            def reformatCoord(list):
+              s = list[2]
+              (lat, _, lon) = s.replace('(','').replace(')','').partition(',')
+              return [list[0], list[1], float(lat), float(lon)]
+            def flipFriendPerspective(list):
+              #Since join has to be done from friend's perspective to get their location
+              #we need to flip the relationship status (this should be faster than two queries)
+              #Also enforces privacy
+              if list[1] == 'Unaccepted':
+                list[1] = 'Pending'
+                list[2] = 0
+                list[3] = 0
+              elif list[1] == 'Pending':
+                list[1] = 'Unaccepted'
+                list[2] = 0
+                list[3] = 0
+              return list
+            def _reformatLocation(list):
+              loc = list[-1]
+              reform = loc.replace('<','').replace('>','').replace('(','').replace(')','').split(',', 2)
+              ret = list[0:-1]
+              ret.extend(map(float, reform))
+              return ret
+            msg = {}
+            msg['Response Type']='Refresh List'
+            msg['Friend List']=map(flipFriendPerspective, map(reformatCoord, flist))
+            msg['Zone List']=map(_reformatLocation, zonelist)
+            self.sendLine(json.dumps(msg))
+
+
+          d1 = pool.runQuery("select users.username, status, lastloc from users inner join friends on users.username=friends.username where friends.friendname=E%s", self.username)
+          d2 = pool.runQuery("select zonename, action, text, zone from zonenames where username=E%s", self.username)
+          d = defer.DeferredList([d1, d2])
+          d.addCallback(_sendFriendsAndZones)
+
       def parseRefreshZones(o):
         if self.username != None:
+          def _reformatLocation(list):
+            loc = list[-1]
+            reform = loc.replace('<','').replace('>','').replace('(','').replace(')','').split(',', 2)
+            ret = list[0:-1]
+            ret.extend(map(float, reform))
+            return ret
+
           def _sendZones(zonelist):
             msg = {}
             msg['Response Type']='Zone List'
-            msg['Zone List']=zonelist
+            msg['Zone List']=map(_reformatLocation, zonelist)
             self.sendLine(json.dumps(msg))
-          pool.runQuery("select zonename, action, text from zonenames where username=E%s", self.username).addCallback(_sendZones)
+          pool.runQuery("select zonename, action, text, zone from zonenames where username=E%s", self.username).addCallback(_sendZones)
+
       def parseUpdateCoord(o):
         if self.username != None:
 
@@ -298,7 +360,7 @@ class gogodeXProtocol(glue.NeutralLineReceiver):
       parseAddFriend, 'Accept Friend': parseAcceptFriend, 'Remove Friend':
       parseRemoveFriend, 'Update Coordinate': parseUpdateCoord, 'Login': parseLogin,
       'Refresh Friends': parseRefreshFriends, 'Logout': parseLogout, 'Refresh Zones':
-      parseRefreshZones}
+      parseRefreshZones, 'Refresh': parseRefresh}
 
       if self.ALLOW_DEBUG_JSON:
         def parseShowUsers(o):

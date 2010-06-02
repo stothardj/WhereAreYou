@@ -76,9 +76,11 @@ public final class R {
         public static final int create_button2=0x7f050011;
         public static final int create_button3=0x7f050012;
         public static final int createaccount_name=0x7f050006;
+        public static final int default_radius=0x7f050022;
         public static final int despassword_prompt=0x7f05000e;
         public static final int despassword_prompt2=0x7f05000f;
         public static final int desusername_prompt=0x7f05000d;
+        public static final int example_zone=0x7f050021;
         public static final int first_prompt=0x7f05000a;
         public static final int friend_name_prompt=0x7f050018;
         public static final int friendslist_name=0x7f050002;
@@ -92,10 +94,10 @@ public final class R {
         public static final int settingActivity_name=0x7f050003;
         public static final int show_gps=0x7f05001c;
         public static final int show_text=0x7f05001d;
-        public static final int summary_polling=0x7f050022;
+        public static final int summary_polling=0x7f050024;
         public static final int summary_show_hide_toggle=0x7f050014;
         public static final int tabs_name=0x7f050005;
-        public static final int title_polling=0x7f050021;
+        public static final int title_polling=0x7f050023;
         public static final int title_show_hide_toggle=0x7f050013;
         public static final int username_prompt=0x7f050008;
         /**  Zones 

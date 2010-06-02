@@ -3,6 +3,7 @@ package gogodeX.GUI;
 import java.io.IOException;
 import java.net.*;
 import java.util.HashMap;
+import java.util.LinkedList;
 
 import android.app.Service;
 import android.content.Context;
@@ -37,8 +38,8 @@ public class GPSUpdater extends Service {
 	//Holds the user's current Location
 	private static Location location;
 	//Variables for holding latitude and longitude values
-	private static double latitude;
-	private static double longitude;
+	private double latitude;
+	private double longitude;
 	//Handler for handling incoming server messages
 	private static String mocLocationProvider;
 	private String JSONString;
@@ -46,6 +47,7 @@ public class GPSUpdater extends Service {
 	private String currentTab;
 	private HashMap<String, Messenger> messengers;
 	private HashMap<String, User> friends;
+	private HashMap<String, Zone> zones;
 	
 	@Override
 	public void onCreate()
@@ -58,15 +60,17 @@ public class GPSUpdater extends Service {
 		//GUI.getLM(LM);
 		//Start the main GPS updating loop
 		GPSHandler();
-		retrieveFriends();
+		
+		refresh();
 	}
 	
-	public void retrieveFriends(){
+	public void refresh(){
 		friends = new HashMap<String, User>();
+		zones = new HashMap<String, Zone>();
 		JSONStringer refresh = new JSONStringer();
 		try {
 			refresh.object();
-			refresh.key("Request Type").value("Refresh Friends");
+			refresh.key("Request Type").value("Refresh");
 	    	refresh.endObject();
 	    	GUI.getClient().sendLine(refresh.toString());
 		} catch (JSONException e) {
@@ -198,6 +202,8 @@ public class GPSUpdater extends Service {
 							e.printStackTrace();
 						}
 					}
+				} else if(msgType.equals("Remove Zone")) {
+					zones.remove(b.getString("Zone Name"));
 				}
 				
 				//Special things to do when tabs are created (bound).
@@ -250,9 +256,43 @@ public class GPSUpdater extends Service {
 							e.printStackTrace();
 						}
 					}
+					else if(currentTab.equals("Zones")) {
+						//Send zone list
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Zone List");
+						Zone[] zarray = new Zone[zones.size()];
+						int i=0;
+						for(String name : zones.keySet()) {
+							zarray[i] = zones.get(name);
+							i++;
+						}
+						bo.putSerializable("Zone Array", zarray);
+						mess.setData(bo);
+						try {
+							messengers.get(currentTab).send(mess);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}
 				}
 				
-				
+				//Special things to do when a tab is switched to
+				if(msgType.equals("Declare Active")) {
+					if(currentTab.equals("Zones")) {
+						Message mess = Message.obtain();
+						Bundle bo = new Bundle();
+						bo.putString("Message Type", "Current Position");
+						bo.putDouble("Lat", latitude);
+						bo.putDouble("Lon", longitude);
+						mess.setData(bo);
+						try {
+							messengers.get(currentTab).send(mess);
+						} catch (RemoteException e) {
+							e.printStackTrace();
+						}
+					}
+				}
 				
 				/*
 				Message mess = Message.obtain();
@@ -278,7 +318,8 @@ public class GPSUpdater extends Service {
 				try {
 					JSONObject jo = new JSONObject(JSONString);
 					String resT = jo.getString("Response Type");
-					if(resT.equals("Friend List")) {
+					if(resT.equals("Refresh List")) {
+						//Copied from Friend List //
 						JSONArray flist = jo.getJSONArray("Friend List");
 						for(int i=0; i<flist.length(); i++) {
 							JSONArray friend = flist.getJSONArray(i);
@@ -295,8 +336,51 @@ public class GPSUpdater extends Service {
 							User user = new User(name, loc, status);
 							friends.put(name, user);
 						}
-					}
-					else if(resT.equals("Friend Requested")) {
+						//Copied fron Zone List //
+						JSONArray zlist = jo.getJSONArray("Zone List");
+						for(int i=0; i<zlist.length(); i++) {
+							JSONArray zone = zlist.getJSONArray(i);
+							String name = zone.getString(0);
+							String action = zone.getString(1);
+							String text= zone.getString(2);
+							double lat = zone.getDouble(3);
+							double lon = zone.getDouble(4);
+							double rad = zone.getDouble(5);
+							zones.put(name, new Zone(name, lat, lon, rad, action, text));
+						}
+						
+					} else if(resT.equals("Friend List")) {
+						//Should not happen any more, obsoleted by global refresh
+						JSONArray flist = jo.getJSONArray("Friend List");
+						for(int i=0; i<flist.length(); i++) {
+							JSONArray friend = flist.getJSONArray(i);
+							String name = friend.getString(0);
+							String status = friend.getString(1);
+							Location loc = null;
+							if(status.equals("Accepted")) {
+								double lat = friend.getDouble(2);
+								double lon = friend.getDouble(3);
+								loc =  new Location("gps");
+								loc.setLatitude(lat);
+								loc.setLongitude(lon);
+							}
+							User user = new User(name, loc, status);
+							friends.put(name, user);
+						}
+					} else if(resT.equals("Zone List")) {
+						//Should not happen any more, obsoleted by global refresh
+						JSONArray zlist = jo.getJSONArray("Zone List");
+						for(int i=0; i<zlist.length(); i++) {
+							JSONArray zone = zlist.getJSONArray(i);
+							String name = zone.getString(0);
+							String action = zone.getString(1);
+							String text= zone.getString(2);
+							double lat = zone.getDouble(3);
+							double lon = zone.getDouble(4);
+							double rad = zone.getDouble(5);
+							zones.put(name, new Zone(name, lat, lon, rad, action, text));
+						}
+					} else if(resT.equals("Friend Requested")) {
 						if(jo.getBoolean("Success")) {
 							String name = jo.getString("Friend Name");
 							if(messengers.containsKey("Friends List")) {
@@ -417,6 +501,29 @@ public class GPSUpdater extends Service {
 							mess2.setData(bo2);
 							messengers.get("Map").send(mess2);
 						}
+					} else if(resT.equals("Zone Added")) {
+						boolean success = jo.getBoolean("Success");
+						if(success) {
+							Zone z = new Zone(jo.getString("Zone Name"),
+									jo.getDouble("Lat"), jo.getDouble("Lon"),
+									jo.getDouble("Radius"), jo.getString("Action"),
+									jo.getString("Text"));
+							zones.put(jo.getString("Zone Name"), z);
+						}
+						if(messengers.containsKey("Zones")) {
+							Message mess2 = Message.obtain();
+							Bundle bo2 = new Bundle();
+							bo2.putString("Message Type", "Zone Added");
+							bo2.putString("Zone Name", jo.getString("Zone Name"));
+							//bo2.putDouble("Lat", jo.getDouble("Lat"));
+							//bo2.putDouble("Lon", jo.getDouble("Lon"));
+							//bo2.putDouble("Radius", jo.getDouble("Radius"));
+							bo2.putString("Action", jo.getString("Action"));
+							//bo2.putString("Text", jo.getString("Text"));
+							bo2.putBoolean("Success", success);
+							mess2.setData(bo2);
+							messengers.get("Zones").send(mess2);
+						}
 					}
 				} catch(JSONException e) {
 					e.printStackTrace();
@@ -429,8 +536,13 @@ public class GPSUpdater extends Service {
 	    t = new Thread() {
 	    	public void run() {
 	    		while(true) {
+	    	    	Thread postThread = new Thread() {
+	    	    		public void run() {
+	    	    			mHandler.post(mh);
+	    	    		}
+	    	    	};
 	    			waitForMessage();
-	    			mHandler.post(mh);
+	    			postThread.start();
 	    		}
 	    	}
 	    };

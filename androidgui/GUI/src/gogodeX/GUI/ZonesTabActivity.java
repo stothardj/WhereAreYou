@@ -1,5 +1,8 @@
 package gogodeX.GUI;
 
+import org.json.JSONException;
+import org.json.JSONStringer;
+
 import android.app.ListActivity;
 import android.content.ComponentName;
 import android.content.Context;
@@ -11,12 +14,20 @@ import android.os.IBinder;
 import android.os.Message;
 import android.os.Messenger;
 import android.os.RemoteException;
+import android.view.View;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.ListView;
+import android.widget.RadioButton;
+import android.widget.RadioGroup;
 import android.widget.Toast;
 
 public class ZonesTabActivity extends ListActivity {
 	private ArrayAdapter<String> zone_list;
 	private Messenger mSender;
+	private double mLat, mLon;
+	private String mZoneName;
 	
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -26,8 +37,51 @@ public class ZonesTabActivity extends ListActivity {
         zone_list = new  ArrayAdapter<String>(this, R.layout.zones_rows, R.id.zone_row);
 	    setListAdapter(zone_list);
 	    
-	    zone_list.add("Test item");
-        
+	    Button add = (Button) findViewById(R.id.add_zone);
+	    add.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View arg0) {
+				//Creating a zone receives no confirmation since there is no logical reason to stop it
+				//We do allow duplicate zone names. All will be removed at the same time.
+				String name = ((EditText) findViewById(R.id.zone_name_text)).getText().toString();
+				double mileRadius = Double.parseDouble(((EditText) findViewById(R.id.zone_radius_text)).getText().toString());
+				if(mileRadius > 0) {
+										
+					//Approximate, does not account for earth curvature
+					final double degPerMile = .0144569;
+					RadioGroup r = ((RadioGroup) findViewById(R.id.zone_name_privacy));
+					int id = r.getCheckedRadioButtonId();
+					RadioButton rb = (RadioButton) findViewById(id);
+					String chosen = rb.getText().toString().toUpperCase();
+					//zone_list.add(name + "\t\t" + chosen);
+			    	JSONStringer zoneAdd = new JSONStringer();
+			    	try 
+			    	{
+			    		zoneAdd.object();
+			    		zoneAdd.key("Zone Name").value(name);
+			    		zoneAdd.key("Lat").value(mLat);
+			    		zoneAdd.key("Lon").value(mLon);
+			    		zoneAdd.key("Radius").value(mileRadius * degPerMile);
+			    		zoneAdd.key("Action").value(chosen);
+			    		zoneAdd.key("Text").value(name);
+			    		zoneAdd.key("Request Type").value("Add Zone");
+			    		zoneAdd.endObject();
+						GUI.getClient().sendLine(zoneAdd.toString());
+					} 
+			    	catch (JSONException e1) 
+					{
+			    		e1.printStackTrace();		
+					}
+			    	
+				} else {
+	        		Context context = getApplicationContext();
+	        		int duration = Toast.LENGTH_SHORT;
+            		Toast toast = Toast.makeText(context, "Please use a positive zone radius.", duration);
+            		toast.show();
+				}
+			}
+	    });
+	    
     	////////////// Setup Two Way Communication ////////////////////
     	final Handler mHandler = new Handler() {
     		@Override
@@ -39,6 +93,24 @@ public class ZonesTabActivity extends ListActivity {
 	        		int duration = Toast.LENGTH_SHORT;
             		Toast toast = Toast.makeText(context, b.getString("Toast Message"), duration);
             		toast.show();
+    			} else if(msgType.equals("Zone List")) {
+    				Zone[] zarray = (Zone[]) b.getSerializable("Zone Array");
+    				for(Zone z : zarray) {
+    					zone_list.add(z.getName() + "\t\t" + z.getAction());
+    				}
+    			} else if(msgType.equals("Current Position")) {
+    				mLat = b.getDouble("Lat");
+    				mLon = b.getDouble("Lon");
+    			} else if(msgType.equals("Zone Added")) {
+    				boolean success = b.getBoolean("Success"); 
+    				if(success) {
+    					zone_list.add(b.getString("Zone Name") + "\t\t" + b.getString("Action"));
+    				} else {
+    	        		Context context = getApplicationContext();
+    	        		int duration = Toast.LENGTH_SHORT;
+                		Toast toast = Toast.makeText(context, "Cannot add "+b.getString("Zone Name"), duration);
+                		toast.show();
+    				}
     			}
     		}
     	};
@@ -83,6 +155,55 @@ public class ZonesTabActivity extends ListActivity {
 				e.printStackTrace();
 			}
 		}
+	}
+	
+	protected void onListItemClick(ListView l, View v, int position, long id) {
+		int row = position;
+		String name = zone_list.getItem(row);
+		String[] possibleEnds = {"SHOWTEXT", "SHOWGPS", "HIDE"};
+		for(String end : possibleEnds) {
+			if(name.endsWith("\t\t"+end))
+				name = name.substring(0, name.length() - new String("\t\t" + end).length());
+		}
+		mZoneName = name;
+		((EditText)findViewById(R.id.zone_name_text)).setText(name);
+		
+		Button remove = (Button) findViewById(R.id.remove_zone);
+		remove.setOnClickListener(new View.OnClickListener() {
+			@Override
+			public void onClick(View v) {
+				//Remove all zones with this name!
+				String[] possibleEnds = {"SHOWTEXT", "SHOWGPS", "HIDE"};
+				
+				for(String end : possibleEnds)
+					zone_list.remove(mZoneName+"\t\t"+end);
+				
+		    	JSONStringer zoneRemove = new JSONStringer();
+		    	try 
+		    	{
+		    		zoneRemove.object();
+		    		zoneRemove.key("Zone Name").value(mZoneName);
+		    		zoneRemove.key("Request Type").value("Remove Zone");
+		    		zoneRemove.endObject();
+					GUI.getClient().sendLine(zoneRemove.toString());
+				} 
+		    	catch (JSONException e1) 
+				{
+		    		e1.printStackTrace();		
+				}
+		    	
+		    	Message mess = Message.obtain();
+		    	Bundle b = new Bundle();
+		    	b.putString("Message Type", "Remove Zone");
+		    	b.putString("Zone Name", mZoneName);
+		    	mess.setData(b);
+		    	try {
+					mSender.send(mess);
+				} catch (RemoteException e) {
+					e.printStackTrace();
+				}
+			}
+		});
 	}
 
 }

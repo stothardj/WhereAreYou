@@ -32,13 +32,15 @@
     
     <!-- Zones -->
     <string name="zone_name_label">Zone Name</string>
-    <string name="zone_radius_label">Zone Radius</string>
+    <string name="zone_radius_label">Zone Radius (in miles)</string>
     <string name="zone_privacy_label">Zone Privacy</string>
-    <string name="show_gps">Show GPS</string>
-    <string name="show_text">Show Text</string>
+    <string name="show_gps">ShowGPS</string>
+    <string name="show_text">ShowText</string>
     <string name="hide">Hide</string>
-    <string name="add_zone">Add Zone</string>
+    <string name="add_zone">Create Zone Here!</string>
     <string name="remove_zone">Remove Zone</string>
+    <string name="example_zone">Home</string>
+    <string name="default_radius">0.5</string>
     
 <string name="title_polling">Polling Frequency</string>
 <string name="summary_polling">Select your desired polling frequency.</string>
