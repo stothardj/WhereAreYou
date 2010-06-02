@@ -486,7 +486,7 @@ public class GPSUpdater extends Service {
 					} else if(resT.equals("Position Update")) {
 						String name = jo.getString("User Name");
 						Location loc = null;
-						String action = jo.getString("action");
+						String action = jo.getString("Action");
 						if(action.equals("SHOWGPS")) {
 							double lat = jo.getDouble("Lat");
 							double lon = jo.getDouble("Lon");
